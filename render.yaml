@@ -16,7 +16,7 @@ services:
     repo: https://github.com/Drojecki/React_Web_Fitness-App
     branch: master
     buildCommand: "npm install && npm run build"
-    startCommand: "npm start"
+    startCommand: "cd src/frontend && npm start"
     env:
       - key: PORT
         value: 3000
