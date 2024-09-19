@@ -78,7 +78,7 @@ const AdminPanel = () => {
 
 	const fetchUserData = async (token, sessionKey, userId) => {
     try {
-        const userResponse = await fetch(`http://localhost:5000/api/users/${userId}`, {
+        const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -100,7 +100,7 @@ const AdminPanel = () => {
 
 const fetchAllUsers = async (token, sessionKey, userId) => {
     try {
-        const allUsersResponse = await fetch(`http://localhost:5000/api/users/${userId}/admin`, {
+        const allUsersResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}/admin`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -121,7 +121,7 @@ const fetchAllUsers = async (token, sessionKey, userId) => {
 
 const fetchNotifications = async (token, sessionKey) => {
     try {
-        const notificationsResponse = await fetch("http://localhost:5000/api/notifications/popup", {
+        const notificationsResponse = await fetch("https://react-web-fitness-app.onrender.com/api/notifications/popup", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -142,7 +142,7 @@ const fetchNotifications = async (token, sessionKey) => {
 
 const fetchEvents = async (token, sessionKey) => {
     try {
-        const eventsResponse = await fetch("http://localhost:5000/api/event", {
+        const eventsResponse = await fetch("https://react-web-fitness-app.onrender.com/api/event", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -181,7 +181,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					"http://localhost:5000/api/notifications",
+					"https://react-web-fitness-app.onrender.com/api/notifications",
 					{
 						method: "POST",
 						headers: {
@@ -215,7 +215,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					`http://localhost:5000/api/notifications/popup/${id}`,
+					`https://react-web-fitness-app.onrender.com/api/notifications/popup/${id}`,
 					{
 						method: "DELETE",
 						headers: {
@@ -267,7 +267,7 @@ const fetchEvents = async (token, sessionKey) => {
 
 		if (token) {
 			try {
-				const response = await fetch("http://localhost:5000/api/event", {
+				const response = await fetch("https://react-web-fitness-app.onrender.com/api/event", {
 					method: "POST",
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -303,7 +303,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					`http://localhost:5000/api/event/${eventId}/status`,
+					`https://react-web-fitness-app.onrender.com/api/event/${eventId}/status`,
 					{
 						method: "PATCH",
 						headers: {
@@ -334,7 +334,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					`http://localhost:5000/api/event/${eventId}`,
+					`https://react-web-fitness-app.onrender.com/api/event/${eventId}`,
 					{
 						method: "DELETE",
 						headers: {
@@ -360,7 +360,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					`http://localhost:5000/api/ban/ban/${userId}`,
+					`https://react-web-fitness-app.onrender.com/api/ban/ban/${userId}`,
 					{
 						method: "POST",
 						headers: {
@@ -388,7 +388,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					`http://localhost:5000/api/ban/unban/${userId}`,
+					`https://react-web-fitness-app.onrender.com/api/ban/unban/${userId}`,
 					{
 						method: "POST",
 						headers: {

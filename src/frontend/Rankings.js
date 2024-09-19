@@ -28,7 +28,7 @@ const Rankings = () => {
           const userId = decodedToken.id;
           const sessionKey = decodedToken.sessionKey;
 
-          const userResponse = await fetch(`http://localhost:5000/api/users/${userId}`, {
+          const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -47,7 +47,7 @@ const Rankings = () => {
             navigate('/');
           }
 
-          const routesResponse = await fetch(`http://localhost:5000/api/users/${userId}/routes_with_usernames`, {
+          const routesResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}/routes_with_usernames`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -62,7 +62,7 @@ const Rankings = () => {
             setError('Błąd podczas pobierania tras użytkownika');
           }
 
-          const rankingResponse = await fetch(`http://localhost:5000/api/ranking/ranking`, {
+          const rankingResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/ranking/ranking`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,

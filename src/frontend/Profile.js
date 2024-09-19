@@ -32,7 +32,7 @@ const Profile = () => {
           const id = decodedToken.id;
           const sessionKey = decodedToken.sessionKey;
           
-          const userResponse = await fetch(`http://localhost:5000/api/users/${id}/profile`, {
+          const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${id}/profile`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -51,7 +51,7 @@ const Profile = () => {
             setEmailNotification(userData[0].email_notifications === 1 ? 'yes' : 'no');
             setPushNotification(userData[0].push_notifications === 1 ? 'yes' : 'no');
 
-            const routesResponse = await fetch(`http://localhost:5000/api/users/${id}/routes`, {
+            const routesResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${id}/routes`, {
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${token}`,
@@ -128,7 +128,7 @@ const Profile = () => {
     formData.append('file', selectedFile);
     formData.append('userId', user.id);
 
-    const response = await fetch('http://localhost:5000/api/profilePicture', {
+    const response = await fetch('https://react-web-fitness-app.onrender.com/api/profilePicture', {
       method: 'POST',
       body: formData,
     });
@@ -141,7 +141,7 @@ const Profile = () => {
   };
 
   const handleProfilePictureDelete = async () => {
-    const response = await fetch('http://localhost:5000/api/profilePicture', {
+    const response = await fetch('https://react-web-fitness-app.onrender.com/api/profilePicture', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ const Profile = () => {
     }
   
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${user.id}/notifications`, {
+      const response = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${user.id}/notifications`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

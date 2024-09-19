@@ -67,7 +67,7 @@ const Trophies = () => {
           const id = decodedToken.id;
           const sessionKey = decodedToken.sessionKey;
 
-          const userResponse = await fetch(`http://localhost:5000/api/users/${id}`, {
+          const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${id}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -82,7 +82,7 @@ const Trophies = () => {
             if (userData[0].is_banned === 1) {
               navigate('/Banned');
             }
-            const routesResponse = await fetch(`http://localhost:5000/api/users/${id}/routes`, {
+            const routesResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${id}/routes`, {
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${token}`,
@@ -114,7 +114,7 @@ const Trophies = () => {
               localStorage.removeItem('authToken');
               navigate('/');
             }
-            const eventsResponse = await fetch('http://localhost:5000/api/event/thropies', {
+            const eventsResponse = await fetch('https://react-web-fitness-app.onrender.com/api/event/thropies', {
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${token}`,

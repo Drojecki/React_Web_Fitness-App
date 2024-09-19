@@ -30,7 +30,7 @@ const Settings = () => {
           const id = decodedToken.id;
           const sessionKey = decodedToken.sessionKey;
 
-          const userResponse = await fetch(`http://localhost:5000/api/users/${id}`, {
+          const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${id}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,

@@ -103,7 +103,7 @@ const Statistics = () => {
           const userId = decodedToken.id;
           const sessionKey = decodedToken.sessionKey;
 
-          const userResponse = await fetch(`http://localhost:5000/api/users/${userId}`, {
+          const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -122,7 +122,7 @@ const Statistics = () => {
             navigate('/');
           }
 
-          const routesResponse = await fetch(`http://localhost:5000/api/users/${userId}/routes`, {
+          const routesResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}/routes`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,

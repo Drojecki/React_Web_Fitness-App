@@ -93,7 +93,7 @@ const UserAcc = () => {
           const userId = decodedToken.id;
           const sessionKey = decodedToken.sessionKey;
 
-          const userResponse = await fetch(`http://localhost:5000/api/users/${userId}`, {
+          const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -117,7 +117,7 @@ const UserAcc = () => {
             navigate('/');
           }
 
-          const routesResponse = await fetch(`http://localhost:5000/api/users/${userId}/routes`, {
+          const routesResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}/routes`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -147,7 +147,7 @@ const UserAcc = () => {
             setCaloriesBurned(totalCaloriesBurned);
             setMoneySaved(totalMoneySaved);
 
-            const eventsResponse = await fetch(`http://localhost:5000/api/event`, {
+            const eventsResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/event`, {
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${token}`,
@@ -180,7 +180,7 @@ const UserAcc = () => {
               const progressMap = {};
 
               const userAlreadyAdded = async (eventId) => {
-                const eventResponse = await fetch(`http://localhost:5000/api/event/${eventId}`, {
+                const eventResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/event/${eventId}`, {
                   method: 'GET',
                   headers: {
                     'Authorization': `Bearer ${token}`,
@@ -243,7 +243,7 @@ const UserAcc = () => {
             const showPopup = localStorage.getItem('showPopup') === 'true';
 
             if (showPopup) {
-              const notificationsResponse = await fetch(`http://localhost:5000/api/notifications/popup`, {
+              const notificationsResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/notifications/popup`, {
                 method: 'GET',
                 headers: {
                   'Authorization': `Bearer ${token}`,
@@ -279,7 +279,7 @@ const UserAcc = () => {
         const token = localStorage.getItem('authToken');
         const userId = jwtDecode(token).id;
 
-        const response = await fetch(`http://localhost:5000/api/event/${event.id}/complete`, {
+        const response = await fetch(`https://react-web-fitness-app.onrender.com/api/event/${event.id}/complete`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

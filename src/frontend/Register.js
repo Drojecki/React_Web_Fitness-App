@@ -105,7 +105,7 @@ const Register = () => {
             gender,
         };
 
-        fetch('http://localhost:5000/api/auth/register', {
+        fetch('https://react-web-fitness-app.onrender.com/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
