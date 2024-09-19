@@ -1,10 +1,22 @@
-# services:
-#   - type: web
-#     name: backend
-#     repo: https://github.com/Drojecki/React_Web_Fitness-App
-#     branch: master
-#     buildCommand: "npm install"
-#     startCommand: "cd src/backend && node server.js"
-#     env:
-#       - key: PORT
-#         value: 5000 
+services:
+  # Konfiguracja backendu
+  - type: web
+    name: backend
+    repo: https://github.com/Drojecki/React_Web_Fitness-App
+    branch: master
+    buildCommand: "npm install"
+    startCommand: "cd src/backend && node server.js"
+    env:
+      - key: PORT
+        value: 5000
+
+  # Konfiguracja frontendu
+  - type: web
+    name: frontend
+    repo: https://github.com/Drojecki/React_Web_Fitness-App
+    branch: master
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"
+    env:
+      - key: PORT
+        value: 3000
