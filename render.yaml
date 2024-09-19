@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: backend
+    repo: https://github.com/Drojecki/React_Web_Fitness-App
+    branch: main
+    buildCommand: "npm install"
+    startCommand: "cd src/backend && node server.js"
+    env:
+      - key: PORT
+        value: 5000 
