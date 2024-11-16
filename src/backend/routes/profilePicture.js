@@ -1,32 +1,34 @@
 const express = require('express');
 const multer = require('multer');
-const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 const db = require('../config/db');
+const fs = require('fs');
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
 
-const googleConfig = {
-  type: "service_account",
-  project_id: process.env.GOOGLE_PROJECT_ID,
-  private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
-  private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-  client_email: process.env.GOOGLE_CLIENT_EMAIL,
-  client_id: process.env.GOOGLE_CLIENT_ID,
-  auth_uri: process.env.GOOGLE_AUTH_URI,
-  token_uri: process.env.GOOGLE_TOKEN_URI,
-  auth_provider_x509_cert_url: process.env.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
-  client_x509_cert_url: process.env.GOOGLE_CLIENT_X509_CERT_URL,
-  universe_domain: "googleapis.com",
-};
-const storage = new Storage({ credentials: googleConfig });
+//folder do zdjęć
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = 'C:/Users/Julas/Desktop/Xamp/htdocs/uploads';
+    
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName); 
+  },
+});
 
-const bucket = storage.bucket('img_inzynierka');
+const upload = multer({ storage });
 
+//wstawianie nowego / usuwanie starego zdjęcia profilowego
 router.post('/', upload.single('file'), async (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: 'Token is required' });
+    }
   if (!req.file) {
-    return res.status(400).send('Brak pliku');
+    return res.status(400).send('file missing');
   }
 
   const userId = req.body.userId;
@@ -34,83 +36,72 @@ router.post('/', upload.single('file'), async (req, res) => {
   const getUserQuery = 'SELECT profilePicture FROM users WHERE id = ?';
   db.query(getUserQuery, [userId], async (err, results) => {
     if (err) {
-      console.error('Błąd podczas pobierania użytkownika:', err);
-      return res.status(500).send('Błąd serwera');
+      console.error('query error', err);
+      return res.status(500).send('server error');
     }
 
-    const currentProfilePictureUrl = results[0]?.profilePicture;
+    const currentProfilePicturePath = results[0]?.profilePicture;
 
-    if (currentProfilePictureUrl) {
-      const currentFileName = currentProfilePictureUrl.split('/').pop();
+    if (currentProfilePicturePath) {
+      const oldPicturePath = path.join('C:/Users/Julas/Desktop/Xamp/htdocs/uploads', path.basename(currentProfilePicturePath));
 
-      const oldFile = bucket.file(currentFileName);
-      try {
-        await oldFile.delete();
-        console.log('Stare zdjęcie profilowe zostało usunięte.');
-      } catch (error) {
-        console.error('Błąd podczas usuwania starego zdjęcia profilowego:', error);
-        return res.status(500).send('Błąd podczas usuwania starego pliku');
-      }
+      fs.unlink(oldPicturePath, (err) => {
+        if (err) {
+          console.error('error deleting old photo', err);
+          return res.status(500).send('error deleting old photo');
+        }
+        console.log('success photo deleted');
+      });
     }
 
-    const blob = bucket.file(`${userId}-${Date.now()}-${req.file.originalname}`);
-    const blobStream = blob.createWriteStream({
-      resumable: false,
-    });
-
-    blobStream.on('finish', async () => {
-      try {
-        await blob.makePublic();
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-
-        const updateQuery = `UPDATE users SET profilePicture = ? WHERE id = ?`;
-        db.query(updateQuery, [publicUrl, userId]);
-
-        res.status(200).send({ url: publicUrl });
-      } catch (error) {
-        console.error('Nie udało się ustawić pliku jako publicznego:', error);
-        res.status(500).send('Błąd podczas ustawiania publicznego dostępu do pliku');
+    const newProfilePicturePath = `/uploads/${req.file.filename}`;
+    const updateQuery = 'UPDATE users SET profilePicture = ? WHERE id = ?';
+    db.query(updateQuery, [newProfilePicturePath, userId], (err) => {
+      if (err) {
+        console.error('query error', err);
+        return res.status(500).send('server error');
       }
+      res.status(200).send({ url: newProfilePicturePath });
     });
-
-    blobStream.end(req.file.buffer);
   });
 });
 
+//usuwanie zdjęcia profilowego
 router.delete('/', async (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: 'Token is required' });
+    }
   const userId = req.body.userId;
 
   const getUserQuery = 'SELECT profilePicture FROM users WHERE id = ?';
   db.query(getUserQuery, [userId], async (err, results) => {
     if (err) {
-      console.error('Błąd podczas pobierania użytkownika:', err);
-      return res.status(500).send('Błąd serwera');
+      console.error('query error', err);
+      return res.status(500).send('server error');
     }
 
-    const currentProfilePictureUrl = results[0]?.profilePicture;
+    const currentProfilePicturePath = results[0]?.profilePicture;
+    if (currentProfilePicturePath) {
+      fs.unlink(path.join('C:/Users/Julas/Desktop/Xamp/htdocs/uploads', path.basename(currentProfilePicturePath)), (err) => {
+        if (err) {
+          console.error('error deleting', err);
+          return res.status(500).send('error deleting');
+        }
 
-    if (currentProfilePictureUrl) {
-      const currentFileName = currentProfilePictureUrl.split('/').pop();
-
-      const file = bucket.file(currentFileName);
-      try {
-        await file.delete();
-        console.log('Zdjęcie profilowe zostało usunięte.');
-
-        const updateQuery = `UPDATE users SET profilePicture = NULL WHERE id = ?`;
-        db.query(updateQuery, [userId]);
-
-        res.status(200).send('Zdjęcie profilowe zostało usunięte.');
-      } catch (error) {
-        console.error('Błąd podczas usuwania zdjęcia profilowego:', error);
-        res.status(500).send('Błąd podczas usuwania pliku');
-      }
+        const updateQuery = 'UPDATE users SET profilePicture = NULL WHERE id = ?';
+        db.query(updateQuery, [userId], (err) => {
+          if (err) {
+            console.error('query error', err);
+            return res.status(500).send('server error');
+          }
+          res.status(200).send('success');
+        });
+      });
     } else {
-      res.status(400).send('Brak zdjęcia profilowego do usunięcia.');
+      res.status(400).send('error , photo missing');
     }
   });
 });
-
-
 
 module.exports = router;

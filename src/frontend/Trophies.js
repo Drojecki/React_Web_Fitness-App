@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import '../css/trophies.css';
 import Sidebar from './Components/Sidebar';
 import '../css/stats.css';
 import Header from './Components/Header';
@@ -17,7 +16,7 @@ const Trophies = () => {
   const [MoneySaved, setMoneySaved] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [user, setUser] = useState(null);
   const [popupVisible, setPopupVisible] = useState(false);
@@ -36,9 +35,11 @@ const Trophies = () => {
       scalar: 2,
     });
   };
+
   const handleTrophyEventClickConfetti = () => {
     triggerConfetti();
   };
+
   const getTrophyLevel = (distance) => {
     if (distance >= 100) return { level: 5, color: 'gold', next: 0 };
     if (distance >= 75) return { level: 4, color: 'silver', next: 100 - distance };
@@ -67,7 +68,7 @@ const Trophies = () => {
           const id = decodedToken.id;
           const sessionKey = decodedToken.sessionKey;
 
-          const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${id}`, {
+          const userResponse = await fetch(`http://localhost:5000/api/users/${id}`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -82,7 +83,7 @@ const Trophies = () => {
             if (userData[0].is_banned === 1) {
               navigate('/Banned');
             }
-            const routesResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${id}/routes`, {
+            const routesResponse = await fetch(`http://localhost:5000/api/users/${id}/routes`, {
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${token}`,
@@ -114,7 +115,7 @@ const Trophies = () => {
               localStorage.removeItem('authToken');
               navigate('/');
             }
-            const eventsResponse = await fetch('https://react-web-fitness-app.onrender.com/api/event/thropies', {
+            const eventsResponse = await fetch(`http://localhost:5000/api/event/thropies/${id}`, {
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${token}`,
@@ -132,22 +133,23 @@ const Trophies = () => {
 
               setEvents(filteredEvents);
             } else {
-              setError('Błąd podczas pobierania danych wydarzeń');
+              setError('events query/server error');
             }
           } else {
-            setError('Błąd podczas pobierania danych użytkownika');
+            setError('user info query/server error');
           }
         } catch (err) {
-          setError('Wystąpił błąd podczas pobierania danych');
+          setError('query/server error');
         }
       } else {
-        setError('Użytkownik nie jest zalogowany');
+        navigate('/');
+        setError('Token is required');
       }
       setLoading(false);
     };
 
     fetchUserData();
-  }, []);
+  }, [navigate]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -249,57 +251,66 @@ const Trophies = () => {
   if (error) return <p>Błąd: {error}</p>;
 
   return (
-    <div className='container'>
-      <Sidebar isOpen={sidebarOpen} user={user} toggleSidebar={toggleSidebar} userRoutes={userRoutes} />
-      <Header
-        user={user}
-        theme={theme}
-        toggleTheme={toggleTheme}
-        toggleSidebar={toggleSidebar}
-      />
-      <h2>🏅 Your Trophies 🏅</h2>
-      <div className="events-container">
-        {events.length > 0 && (
-          <ul className="UniqueThropies ">
-            {events.map(event => (
-              <li key={event.id} className="UniqueThropy HoverTrophy" onClick={() => handleTrophyEventClick(event)}>
-                <img src={event.TrophyImage} alt={event.title} />
-              </li>
-            ))}
-          </ul>
-        )}
 
-        {selectedEvent && (
-          <div className="modalEvent">
-            <div className="modal-contentEvent" ref={popupRef}>
-              <span className="close" onClick={handleCloseEventModal}>&times;</span>
-              <div className='row EventTitle'><p>! Congratiulations !</p></div>
-              <div className='row EventTitle'><p>Trophy earned by competing in</p></div>
-              <div className='row EventDesc'><p>{selectedEvent.title} Event!</p></div>
+    <div className='w-full h-full min-h-screen bg-[#6E9B7B] content-center'>
+      <div className='flex w-full max-w-[1440px] min-h-[800px]  h-full justify-self-center gap-[10px] p-[10px]'>
+        <div className='w-[20%] max-w-[120px]  rounded-[10px] bg-[#D9EDDF] justify-items-center max-h-[760px]'>
+          <Sidebar />
+        </div>
+        <div className='scrollbar-hide flex w-[100%] bg-[#D9EDDF] max-h-[760px] rounded-[10px] overflow-y-scroll justify-center'>
+          <div className='flex justify-start min-h-screeen items-center flex-col w-full max-w-[1600px] justify-self-center'>
+            <Header
+              user={user}
+              theme={theme}
+              toggleTheme={toggleTheme}
+              toggleSidebar={toggleSidebar}
+            />
+            <h2>🏅 Your Trophies 🏅</h2>
+            <div className="">
+              {events.length > 0 && (
+                <ul className="flex">
+                  {events.map(event => (
+                    <li key={event.id} className="hover:scale-105 hover:cursor-pointer " onClick={() => handleTrophyEventClick(event)}>
+                      <img className='w-[100px] h-[100px] m-auto rounded-[50%] border-black border-[2px]' src={`http://localhost/uploads/${event.TrophyImage.split('/').pop()}`} alt={event.title} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {selectedEvent && (
+                <div className="flex fixed top-0 left-0 z-50 w-full h-full justify-center items-center bg-black bg-opacity-60">
+                  <div className="bg-white p-[20px] rounded-[20px] w-[95%] h-[300px] max-w-[600px] relative animate-fadeIn" ref={popupRef}>
+                    <span className="" onClick={handleCloseEventModal}>&times;</span>
+                    <div className=''><p>! Congratiulations !</p></div>
+                    <div className=''><p>Trophy earned by competing in</p></div>
+                    <div className=''><p>{selectedEvent.title} Event!</p></div>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
-      </div>
-      <div className="trophies-container testyy">
-        <TrophyList
-          runningDistance={runningDistance}
-          cyclingDistance={cyclingDistance}
-          Co2Saved={Co2Saved}
-          CaloriesBurned={CaloriesBurned}
-          MoneySaved={MoneySaved}
-          handleTrophyClick={handleTrophyClick}
-        />
-      </div>
-      {popupVisible && (
-        <div className="popup1">
-          <div className="popup1-content" ref={popupRef}>
-            <p className='headerModalTrophy'>{popupContent.title}</p>
-            <p>Level: {popupContent.level}</p>
-            <p>{popupContent.detail}</p>
-            <p>{popupContent.fact}</p>
+            <div className="">
+              <TrophyList
+                runningDistance={runningDistance}
+                cyclingDistance={cyclingDistance}
+                Co2Saved={Co2Saved}
+                CaloriesBurned={CaloriesBurned}
+                MoneySaved={MoneySaved}
+                handleTrophyClick={handleTrophyClick}
+              />
+            </div>
+            {popupVisible && (
+              <div className="fixed justify-center items-center top-0 left-0 w-full h-full flex bg-black bg-opacity-60 z-50">
+                <div className="animate-fadeIn p-[30px] bg-[#fff] rounded-[15px] w-[95%] max-w-[500px] h-[300px] text-center" ref={popupRef}>
+                  <p>{popupContent.title}</p>
+                  <p>Level: {popupContent.level}</p>
+                  <p>{popupContent.detail}</p>
+                  <p>{popupContent.fact}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

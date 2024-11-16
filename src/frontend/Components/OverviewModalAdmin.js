@@ -18,7 +18,7 @@ const OverviewModalAdmin = () => {
                     const sessionKey = decodedToken.sessionKey;
 
 
-                    const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/admin`, {
+                    const userResponse = await fetch(`http://localhost:5000/api/admin`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -35,7 +35,7 @@ const OverviewModalAdmin = () => {
                     }
 
 
-                 const newUserResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/admin/this-week`, {
+                 const newUserResponse = await fetch(`http://localhost:5000/api/admin/this-week`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -50,7 +50,7 @@ const OverviewModalAdmin = () => {
                         console.error('Error fetching new user data:', newUserResponse.status);
                     }
 
-                    const activeEventsResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/admin/active-events`, {
+                    const activeEventsResponse = await fetch(`http://localhost:5000/api/admin/active-events`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,

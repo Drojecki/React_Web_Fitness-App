@@ -30,7 +30,7 @@ const AdminPanel = () => {
 	const [endDate, setEndDate] = useState("");
 	const [eventImage, setEventImage] = useState(null);
 	const [showEvent, setShowEvent] = useState(false);
-	const [sidebarOpen, setSidebarOpen] = useState(true);
+	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [activeModal, setActiveModal] = useState('');
 	const [currentStep, setCurrentStep] = useState(1);
 	const [trophyImage, setTrophyImage] = useState(null);
@@ -43,8 +43,7 @@ const AdminPanel = () => {
 					const decodedToken = jwtDecode(token);
 					const userId = decodedToken.id;
 					const sessionKey = decodedToken.sessionKey;
-	
-					if (userId !== 48 && userId !== 52) {
+					if (decodedToken.Admin !== 1) {
 						localStorage.removeItem("authToken");
 						localStorage.removeItem("cooldownTimestamp");
 						navigate("/");
@@ -78,7 +77,7 @@ const AdminPanel = () => {
 
 	const fetchUserData = async (token, sessionKey, userId) => {
     try {
-        const userResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}`, {
+        const userResponse = await fetch(`http://localhost:5000/api/users/${userId}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -100,7 +99,7 @@ const AdminPanel = () => {
 
 const fetchAllUsers = async (token, sessionKey, userId) => {
     try {
-        const allUsersResponse = await fetch(`https://react-web-fitness-app.onrender.com/api/users/${userId}/admin`, {
+        const allUsersResponse = await fetch(`http://localhost:5000/api/users/${userId}/admin`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -111,17 +110,22 @@ const fetchAllUsers = async (token, sessionKey, userId) => {
         if (allUsersResponse.ok) {
             const usersData = await allUsersResponse.json();
             return usersData;
+        } else if (allUsersResponse.status === 403) {
+            localStorage.removeItem('authToken');
+            navigate('/');
         } else {
             throw new Error("Błąd podczas pobierania listy użytkowników");
         }
     } catch (err) {
+        console.error(err);
         throw new Error("Wystąpił błąd podczas pobierania listy użytkowników");
     }
 };
 
+
 const fetchNotifications = async (token, sessionKey) => {
     try {
-        const notificationsResponse = await fetch("https://react-web-fitness-app.onrender.com/api/notifications/popup", {
+        const notificationsResponse = await fetch("http://localhost:5000/api/notifications/popup", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -142,7 +146,7 @@ const fetchNotifications = async (token, sessionKey) => {
 
 const fetchEvents = async (token, sessionKey) => {
     try {
-        const eventsResponse = await fetch("https://react-web-fitness-app.onrender.com/api/event", {
+        const eventsResponse = await fetch("http://localhost:5000/api/event", {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -181,7 +185,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					"https://react-web-fitness-app.onrender.com/api/notifications",
+					"http://localhost:5000/api/notifications",
 					{
 						method: "POST",
 						headers: {
@@ -215,7 +219,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					`https://react-web-fitness-app.onrender.com/api/notifications/popup/${id}`,
+					`http://localhost:5000/api/notifications/popup/${id}`,
 					{
 						method: "DELETE",
 						headers: {
@@ -267,7 +271,7 @@ const fetchEvents = async (token, sessionKey) => {
 
 		if (token) {
 			try {
-				const response = await fetch("https://react-web-fitness-app.onrender.com/api/event", {
+				const response = await fetch("http://localhost:5000/api/event", {
 					method: "POST",
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -303,7 +307,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					`https://react-web-fitness-app.onrender.com/api/event/${eventId}/status`,
+					`http://localhost:5000/api/event/${eventId}/status`,
 					{
 						method: "PATCH",
 						headers: {
@@ -334,7 +338,7 @@ const fetchEvents = async (token, sessionKey) => {
 		if (token) {
 			try {
 				const response = await fetch(
-					`https://react-web-fitness-app.onrender.com/api/event/${eventId}`,
+					`http://localhost:5000/api/event/${eventId}`,
 					{
 						method: "DELETE",
 						headers: {
@@ -357,10 +361,11 @@ const fetchEvents = async (token, sessionKey) => {
 	};
 	const banUser = async (userId) => {
 		const token = localStorage.getItem("authToken");
+		
 		if (token) {
 			try {
 				const response = await fetch(
-					`https://react-web-fitness-app.onrender.com/api/ban/ban/${userId}`,
+					`http://localhost:5000/api/ban/ban/${userId}`,
 					{
 						method: "POST",
 						headers: {
@@ -371,7 +376,10 @@ const fetchEvents = async (token, sessionKey) => {
 				);
 
 				if (response.ok) {
-					const updatedBans = await fetchAllUsers(token);
+					const decodedToken = jwtDecode(token);
+					const userId = decodedToken.id;
+					const sessionKey = decodedToken.sessionKey;
+					const updatedBans = await fetchAllUsers(token, sessionKey, userId);
         			setUsers(updatedBans);
 				} else {
 					alert("Error Banning user");
@@ -385,10 +393,11 @@ const fetchEvents = async (token, sessionKey) => {
 	
 	const unbanUser =  async (userId) => {
 		const token = localStorage.getItem("authToken");
+		
 		if (token) {
 			try {
 				const response = await fetch(
-					`https://react-web-fitness-app.onrender.com/api/ban/unban/${userId}`,
+					`http://localhost:5000/api/ban/unban/${userId}`,
 					{
 						method: "POST",
 						headers: {
@@ -399,7 +408,10 @@ const fetchEvents = async (token, sessionKey) => {
 				);
 
 				if (response.ok) {
-					const updatedBans = await fetchAllUsers(token);
+					const decodedToken = jwtDecode(token);
+					const userId = decodedToken.id;
+					const sessionKey = decodedToken.sessionKey;
+					const updatedBans = await fetchAllUsers(token, sessionKey, userId);
         			setUsers(updatedBans);
 				} else {
 					alert("Error UnBanning user");
@@ -420,7 +432,7 @@ const fetchEvents = async (token, sessionKey) => {
 	if (error) return <p>{error}</p>;
 
 	return (
-		<div className="container">
+		<div className='flex justify-start h-screen min-h-screeen items-center flex-col w-full max-w-[1600px] justify-self-center'>
 		<SidebarAdmin isOpen={sidebarOpen}toggleSidebar={toggleSidebar}toggleModal={toggleModal} />
 			<div className="row">
 			<button className="button btncos" onClick={toggleSidebar}>☰</button>

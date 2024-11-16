@@ -8,97 +8,92 @@ const router = express.Router();
 const SECRET_KEY = process.env.SECRET_KEY;
 const crypto = require('crypto');
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
 
-  if (token == null) return res.sendStatus(401); 
-
-  jwt.verify(token, SECRET_KEY, (err, payload) => {
-    if (err) return res.sendStatus(403); 
-
-    db.query('SELECT session_key FROM users WHERE id = ?', [payload.id], (err, results) => {
-      if (err) {
-        console.error('db error:', err);
-        return res.status(500).json({ error: 'querry error' });
-      }
-
-      if (results.length === 0 || results[0].session_key !== payload.sessionKey) {
-        return res.sendStatus(403); 
-      }
-
-      req.user = payload;
-      next();
-    });
-  });
-};
-
-
-
+//obsługa rejestracji
 router.post('/register', async (req, res) => {
   const { name, password, email, age, gender } = req.body;
-  console.log('Received data:', { name, password, email, age, gender });
-  
+
   if (!name || !password || !email || !age || !gender) {
-    return res.status(400).json({ error: 'All fields are required' });
+    return res.status(400).json({ error: 'missing field' });
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const userData = {
-      name,
-      password: hashedPassword,
-      email,
-      age,
-      gender,
-      created_at: moment().format('YYYY-MM-DD HH:mm:ss')
-    };
-
-    const query = `
-      INSERT INTO users (username, password_hash, email, age, gender, created_at)
-      VALUES (?, ?, ?, ?, ?, ?)
+    const checkQuery = `
+      SELECT * FROM users WHERE username = ? OR email = ?
     `;
+    const checkValues = [name, email];
 
-    const values = [
-      userData.name,
-      userData.password,
-      userData.email,
-      userData.age,
-      userData.gender,
-      userData.created_at
-    ];
-
-    db.query(query, values, (err, results) => {
+    db.query(checkQuery, checkValues, async (err, results) => { 
       if (err) {
-        console.error('querry error:', err);
+        console.error('DB error', err);
         return res.status(500).json({ error: 'DB error' });
       }
-      res.json({ message: 'User registered successfully!' });
-      console.log('udalo sie');
+
+      if (results.length > 0) {
+        const existingUser = results[0];
+        if (existingUser.username === name) {
+            return res.status(400).json({ error: 'username exists' });
+        }
+        if (existingUser.email === email) {
+            return res.status(400).json({ error: 'email exists' });
+        }
+    }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const userData = {
+        name,
+        password: hashedPassword,
+        email,
+        age,
+        gender,
+        created_at: moment().format('YYYY-MM-DD HH:mm:ss')
+      };
+
+      const query = `
+        INSERT INTO users (username, password_hash, email, age, gender, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+
+      const values = [
+        userData.name,
+        userData.password,
+        userData.email,
+        userData.age,
+        userData.gender,
+        userData.created_at
+      ];
+
+      db.query(query, values, (err, results) => {
+        if (err) {
+          console.error('DB error', err);
+          return res.status(500).json({ error: 'DB error' });
+        }
+        res.json({ message: 'success' });
+      });
     });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error('error', error);
+    res.status(500).json({ error: 'error' });
   }
 });
 
+//obsługa loginu
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ error: 'Username and pass are required' });
+    return res.status(400).json('Username and pass are required');
   }
 
   try {
     db.query('SELECT * FROM users WHERE username = ?', [username], async (err, results) => {
       if (err) {
-        console.error('DB error:', err);
-        return res.status(500).json({ error: 'querry error' });
+        res.status(500).json('error');
       }
 
       if (results.length === 0) {
-        return res.status(400).json({ error: 'Wrong username or pass' });
+        return res.status(400).json('error');
       }
 
       const user = results[0];
@@ -109,25 +104,21 @@ router.post('/login', async (req, res) => {
         
         db.query('UPDATE users SET session_key = ? WHERE id = ?', [sessionKey, user.id], (err) => {
           if (err) {
-            console.error('Błąd aktualizacji klucza sesji:', err);
-            return res.status(500).json({ error: 'Błąd aktualizacji klucza sesji' });
+            return res.status(500);
           }
           
-          const token = jwt.sign({ id: user.id, username: user.username, sessionKey }, SECRET_KEY, { expiresIn: '1h' });
+          const token = jwt.sign({ id: user.id, username: user.username,Admin: user.is_Admin, sessionKey }, SECRET_KEY, { expiresIn: '12h' });
           res.json({ token });
         });
       } else {
-        return res.status(400).json({ error: 'Wrong username or pass' });
+        return res.status(400).json('error');
       }
     });
   } catch (error) {
-    console.error('server error:', error);
-    res.status(500).json({ error: 'server error' });
+    res.status(500).json('error');
   }
 });
 
-router.get('/protected', authenticateToken, (req, res) => {
-  res.json({});
-});
 
-module.exports = { authenticateToken, router };
+
+module.exports = { router };

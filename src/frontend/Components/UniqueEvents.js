@@ -4,38 +4,40 @@ const UniqueEvents = ({ events, currentIndex, progressData, handleDotClick }) =>
   if (events.length === 0) return null;
 
   return (
-    <div className="unique-events-container">
-      <div className="unique-event-item">
+    <div className="relative CustomSM:max-w-[95%] max-w-[820px] w-[100%] h-[150px]  text-white  shadow-[5px_5px_10px_rgba(0,0,0,0.2)]">
+      <div className="bg-none">
         <div
-          className="unique-event-background"
-          style={{ backgroundImage: `url(${events[currentIndex].image})` }}
+          className="absolute top-0 left-0 w-full h-full bg-cover rounded-[5px] transition ease-in duration-800"
+          style={{
+            backgroundImage: `url(http://localhost/uploads/${events[currentIndex].image.split('/').pop()})`,
+          }}
         />
-        <div className="unique-event-header">
-          <h3 className="unique-event-title">{events[currentIndex].title}</h3>
-          <div className="progress-bar-container-wrapper">
-            <div className="progress-bar-container">
-              <div
-                className="progress-bar1"
-                style={{ width: `${progressData[events[currentIndex].id] || 0}%` }}
-              />
+
+        <div className="relative flex items-center justify-between m-[10px]">
+          <h3 className="text-[24px]">{events[currentIndex].title}</h3>
+          <div className="flex flex-col justify-center w-[150px]">
+            <div className="w-full bg-white h-[20px] overflow-hidden ">
+              <div className="h-full bg-progress-gradient bg-[length:200%_100%] animate-scrolling-progress"
+                style={{ width: `${progressData[events[currentIndex].id] || 0}%` }}>
+              </div>
             </div>
           </div>
         </div>
-        <div className="unique-event-content">
-          <p className="unique-event-description">{events[currentIndex].description}</p>
+        <div className="relative">
+          <p className="pl-[10px] text-white">{events[currentIndex].description}</p>
         </div>
-        <div className="unique-event-footer">
-          <p className="unique-event-date"><strong>Start Date:</strong> {new Date(events[currentIndex].startDate).toLocaleDateString()}</p>
-          <p className="unique-event-date"><strong>End Date:</strong> {new Date(events[currentIndex].endDate).toLocaleDateString()}</p>
-        </div>
-        <div className="unique-dots-container">
+        <div className="relative flex justify-between  mt-[40px] text-center CustomXSM:mt-[20px]">
+          <p className="flex-1 text-white font-bold "><strong>Start Date:</strong> {new Date(events[currentIndex].startDate).toLocaleDateString()}</p>
+          <div className="flex-1 flex justify-center translate-x-[-0%] CustomXSM:items-center">
           {events.map((_, index) => (
             <span
               key={index}
-              className={`unique-dot ${index === currentIndex ? 'active' : ''}`}
+              className={`m-[2px] w-[15px] h-[15px] bg-gray-300 rounded-[50%] border-[2px] border-gray-300 cursor-pointer unique-dot ${index === currentIndex ? 'active' : ''}`}
               onClick={() => handleDotClick(index)}
             />
           ))}
+        </div>
+          <p className="flex-1 text-white font-bold "><strong>End Date:</strong> {new Date(events[currentIndex].endDate).toLocaleDateString()}</p>
         </div>
       </div>
     </div>

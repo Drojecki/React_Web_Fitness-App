@@ -3,11 +3,14 @@ const db = require('../config/db');
 
 const router = express.Router();
 
+//pobieranie danych rankingu Co2 Kcal i zaoszczędzonych pieniędzy
 router.get('/ranking', (req, res) => {
-
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Token is required' });
+  }
   const sqlRanking = `
-    SELECT
-      user_id,
+    SELECT user_id,
       SUM(CO2) AS total_CO2,
       SUM(kcal) AS total_kcal,
       SUM(money) AS total_money
@@ -18,12 +21,12 @@ router.get('/ranking', (req, res) => {
   
   db.query(sqlRanking, (err, results) => {
     if (err) {
-      console.error('Query error:', err);
+      console.error('query error', err);
       return res.status(500).json({ error: 'DB error' });
     }
     
     if (results.length === 0) {
-      console.log('No ranking data found');
+      console.log('error');
     }
 
     res.json(results);
