@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: ./  # Budowanie aplikacji frontendowej
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    command: ["sh", "-c", "npm start"]
+
+  backend:
+    build:
+      context: ./src/backend  # Budowanie aplikacji backendowej
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    environment:
+      DB_HOST: db  # Nazwa usługi bazy danych
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: inzynierka
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0  # Usługa bazy danych MySQL
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: inzynierka
+    volumes:
+      - db_data:/var/lib/mysql  # Przechowywanie danych bazy
+      - ./inzynierka.sql:/docker-entrypoint-initdb.d/inzynierka.sql:ro  # Automatyczne inicjowanie bazy danych
+    ports:
+      - "3307:3306"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:

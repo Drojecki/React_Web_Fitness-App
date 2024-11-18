@@ -1,251 +1,262 @@
 const express = require('express');
 const multer = require('multer');
-const db = require('../config/db');
+const { getDb } = require('../config/db');
 const path = require('path');
 const router = express.Router();
+
 
 //sciezka do przechowywania zdjec 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = 'C:/Users/Julas/Desktop/Xamp/htdocs/uploads';
-    
+    const uploadPath = path.resolve('/app/src/uploads');
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-      cb(null, file.originalname); 
+    cb(null, file.originalname);
   },
 });
 
 const upload = multer({ storage });
 
 //wyświetla unikalne id zdobyte przez usera
-router.get('/thropies/:id', (req, res) => {
+router.get('/trophies/:id', async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
-  const id = req.params.id;
-    if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
-    }  
+  const userId = req.params.id;
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token is required' });
+  }
+
+  try {
+    const db = await getDb();
     const sqlQuery = 'SELECT id, title, image, TrophyImage, user_ids FROM events WHERE FIND_IN_SET(?, user_ids) > 0';
-    
-    db.query(sqlQuery,[id], (err, results) => {
-      if (err) {
-        console.error('query error', err);
-        return res.status(500).json({ error: 'DB error' });
-      }
-      res.json(results);
-    });
-  });
+    const [results] = await db.execute(sqlQuery, [userId]);
+
+    if (results.length === 0) {
+      return res.status(200).json({ message: 'No trophies found' });
+    }
+
+    res.json(results);
+    console.log(results);
+    return res.status(200).json({ message: 'Gicior' });
+  } catch (err) {
+    console.error('Query error:', err);
+    return res.status(500).json({ error: 'DB error' });
+  }
+});
 
   //tworzenie eventu z panelu admina
   router.post('/', upload.fields([{ name: 'image' }, { name: 'trophyImage' }]), async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
+    const uploadPath = '/app/src/uploads';
     if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
+        return res.status(401).json({ error: 'Token is required' });
     }
+    
     const { title, description, startDate, endDate, type, distance } = req.body;
     const files = req.files;
 
     if (!title || !description || !startDate || !endDate || !type || !distance) {
-        return res.status(400).json({ message: 'all fields are required' });
+        return res.status(400).json({ message: 'All fields are required' });
     }
 
-        let imageUrl = null;
-        let trophyImageUrl = null;
+    let imageUrl = null;
+    let trophyImageUrl = null;
 
-        if (files && files.image && files.image[0]) {
-          imageUrl = `uploads/${files.image[0].originalname}`;
-        }
-      
-        if (files && files.trophyImage && files.trophyImage[0]) {
-          trophyImageUrl = `uploads/${files.trophyImage[0].originalname}`;
-        }
+    if (files && files.image && files.image[0]) {
+        imageUrl = `${uploadPath}/${files.image[0].originalname}`;
+    }
 
-        const sqlInsertEvent = `
-            INSERT INTO events (title, description, startDate, endDate, type, distance, image, TrophyImage)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+    if (files && files.trophyImage && files.trophyImage[0]) {
+        trophyImageUrl = `${uploadPath}/${files.trophyImage[0].originalname}`;
+    }
 
-        db.query(sqlInsertEvent, [title, description, startDate, endDate, type, distance, imageUrl, trophyImageUrl], (err, result) => {
-            if (err) {
-                console.error('error', err);
-                return res.status(500).json({ message: 'server error' });
-            }
-            res.status(201).json({ message: 'event created', eventId: result.insertId });
-        });
-
+    const sqlInsertEvent = `
+        INSERT INTO events (title, description, startDate, endDate, type, distance, image, TrophyImage)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
     
+    try {
+      const db = await getDb();
+        const [result] = await db.execute(sqlInsertEvent, [title, description, startDate, endDate, type, distance, imageUrl, trophyImageUrl]);
+        
+        res.status(201).json({ message: 'Event created', eventId: result.insertId });
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
+
 
 //usuwa event i wszystkie jego dane 
 router.delete('/:eventId', async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
-    }
+  if (!token) {
+    return res.status(401).json({ error: 'Token is required' });
+  }
+  
   const eventId = req.params.eventId;
 
-  const sqlSelectEvent = 'SELECT image, TrophyImage FROM events WHERE id = ?';
-  db.query(sqlSelectEvent, [eventId], async (err, results) => {
-    if (err) {
-      console.error('query error', err);
-      return res.status(500).json({ message: 'query error' });
-    }
+  try {
+    const db = await getDb();
+    const sqlSelectEvent = 'SELECT image, TrophyImage FROM events WHERE id = ?';
+    const [results] = await db.execute(sqlSelectEvent, [eventId]);
 
     if (results.length === 0) {
-      return res.status(404).json({ message: 'event not found' });
+      return res.status(404).json({ message: 'Event not found' });
     }
 
     const event = results[0];
     const imageUrl = event.image;
     const trophyImageUrl = event.TrophyImage;
 
-    const fs = require('fs');
-    
+    // Usuwanie obrazów, jeśli istnieją
     if (imageUrl) {
-      const filePath = path.join('C:/Users/Julas/Desktop/Xamp/htdocs/', imageUrl);
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error('error deleting image', err);
-        }
-      });
+      const imageFilePath = path.join('/app/src/uploads', imageUrl);
+      try {
+        await fs.unlink(imageFilePath);
+        console.log('Image deleted:', imageFilePath);
+      } catch (err) {
+        console.error('Error deleting image:', err);
+      }
     }
 
     if (trophyImageUrl) {
-      const trophyFilePath = path.join('C:/Users/Julas/Desktop/Xamp/htdocs/', trophyImageUrl);
-      fs.unlink(trophyFilePath, (err) => {
-        if (err) {
-          console.error('error deleting image', err);
-        }
-      });
+      const trophyFilePath = path.join('/app/src/uploads', trophyImageUrl);
+      try {
+        await fs.unlink(trophyFilePath);
+        console.log('Trophy image deleted:', trophyFilePath);
+      } catch (err) {
+        console.error('Error deleting trophy image:', err);
+      }
     }
 
     const deleteEventQuery = 'DELETE FROM events WHERE id = ?';
-    db.query(deleteEventQuery, [eventId], (err) => {
-      if (err) {
-        console.error('error deleting event', err);
-        return res.status(500).json({ message: 'error deleting event' });
-      }
-      res.status(200).json({ message: 'event deleted' });
-    });
-  });
+    await db.execute(deleteEventQuery, [eventId]);
+
+    res.status(200).json({ message: 'Event deleted' });
+
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
   
 //wyświetla dane eventów
-  router.get('/', async (req, res) => {
-    
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
-    }
-
-    const sqlSelectEvents = 'SELECT * FROM events';
-
-    db.query(sqlSelectEvents, (err, results) => {
-      if (err) {
-        console.error('query error', err);
-        return res.status(500).json({ message: 'server error' });
-      }
-      
-      const processedResults = results.map(event => {
-        return {
-          ...event,
-          user_ids: event.user_ids ? event.user_ids.split(',') : []
-        };
-      });
-  
-      res.status(200).json(processedResults);
-    });
-  });
-
-
-
-router.patch('/:id/status', (req, res) => {
+router.get('/', async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
-    } 
-  const { id } = req.params;
-    const { status } = req.body;
-    
-    if (!['active', 'inactive'].includes(status)) {
-      return res.status(400).json({ error: 'error' });
-    }
-  
-    const sql = 'UPDATE events SET status = ? WHERE id = ?';
-    db.query(sql, [status, id], (err) => {
-      if (err) {
-        console.error('query error', err);
-        return res.status(500).json({ error: 'DB error' });
-      }
-      res.json({ message: 'event updated' });
-    });
-  });
+  if (!token) {
+    return res.status(401).json({ error: 'Token is required' });
+  }
 
-  router.post('/:eventId/complete', (req, res) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
-    }
-    const { userId } = req.body;
-    const { eventId } = req.params;
-  
-    const sqlCheckUser = `
-      SELECT user_ids FROM events WHERE id = ?
-    `;
-  
-    db.query(sqlCheckUser, [eventId], (err, results) => {
-      if (err) {
-        console.error('query error', err);
-        return res.status(500).json({ error: 'DB error' });
-      }
-  
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'even not found' });
-      }
-  
-      const userIds = results[0].user_ids ? results[0].user_ids.split(',') : [];
-  
-      if (userIds.includes(userId.toString())) {
-        return res.status(200).json({ message: 'user already added' });
-      }
-  
-      userIds.push(userId);
-      const updatedUserIds = userIds.join(',');
-  
-      const sqlUpdateEvent = `
-        UPDATE events
-        SET user_ids = ?
-        WHERE id = ?
-      `;
-  
-      db.query(sqlUpdateEvent, [updatedUserIds, eventId], (err) => {
-        if (err) {
-          console.error('query error', err);
-          return res.status(500).json({ error: 'DB error' });
-        }
-        res.status(200).json({ message: 'user added' });
-      });
+  try {
+    const db = await getDb();
+    const sqlSelectEvents = 'SELECT * FROM events';
+    const [results] = await db.execute(sqlSelectEvents);
+    const processedResults = results.map(event => {
+      return {
+        ...event,
+        user_ids: event.user_ids ? event.user_ids.split(',') : []
+      };
     });
-  });
-  router.get('/:id', (req, res) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
-    }
-    const eventId = req.params.id;
-    const sql = 'SELECT * FROM events WHERE id = ?';
+
+    res.status(200).json(processedResults);
+  } catch (err) {
+    console.error('query error', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
+
+router.patch('/:id/status', async (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Token is required' });
+  }
+
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!['active', 'inactive'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status' });
+  }
+
+  try {
+    const db = await getDb();
+    const sql = 'UPDATE events SET status = ? WHERE id = ?';
+    await db.execute(sql, [status, id]);
+
+    res.json({ message: 'Event updated successfully' });
+  } catch (err) {
+    console.error('Query error', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+
+router.post('/:eventId/complete', async (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Token is required' });
+  }
   
-    db.query(sql, [eventId], (err, results) => {
-      if (err) {
-        console.error('query error', err);
-        return res.status(500).json({ error: 'DB error' });
-      }
-      if (results.length === 0) {
-        return res.status(404).json({ error: 'error' });
-      }
-      res.json(results[0]);
-    });
-  });
+  const { userId } = req.body;
+  const { eventId } = req.params;
+
+  try {
+    const db = await getDb();
+    const sqlCheckUser = 'SELECT user_ids FROM events WHERE id = ?';
+    const [results] = await db.execute(sqlCheckUser, [eventId]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    const userIds = results[0].user_ids ? results[0].user_ids.split(',') : [];
+
+    if (userIds.includes(userId.toString())) {
+      return res.status(200).json({ message: 'User already added' });
+    }
+
+    userIds.push(userId);
+    const updatedUserIds = userIds.join(',');
+
+    const sqlUpdateEvent = 'UPDATE events SET user_ids = ? WHERE id = ?';
+    await db.execute(sqlUpdateEvent, [updatedUserIds, eventId]);
+
+    res.status(200).json({ message: 'User added' });
+  } catch (err) {
+    console.error('Query error', err);
+    res.status(500).json({ error: 'DB error' });
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Token is required' });
+  }
+
+  const eventId = req.params.id;
+  const sql = 'SELECT * FROM events WHERE id = ?';
+
+  try {
+    const db = await getDb();
+    const [results] = await db.execute(sql, [eventId]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    res.json(results[0]);
+  } catch (err) {
+    console.error('Query error', err);
+    res.status(500).json({ error: 'DB error' });
+  }
+});
+
 
 module.exports = router;

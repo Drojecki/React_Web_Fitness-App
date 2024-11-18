@@ -163,7 +163,7 @@ const Rankings = () => {
             )}
             {showImage && userData.profilePicture && (
               <img
-                src={`http://localhost${userData.profilePicture}`}
+                src={`http://localhost:5000/uploads/${userData.profilePicture.split('/').pop()}`}
                 alt="Profile"
                 className={`mb-[35px] CustomXSM:w-[90px] CustomXSM:h-[90px] w-[130px] h-[130px] rounded-full ${borderClass}`}
               />

@@ -112,10 +112,12 @@ const Trophies = () => {
               setCaloriesBurned(totalCaloriesBurned);
               setMoneySaved(totalMoneySaved);
             } else {
+              const errorDetails = await routesResponse.text(); // Szczegóły błędu
+      console.log('Błąd tras:', routesResponse.status, errorDetails);
               localStorage.removeItem('authToken');
               navigate('/');
             }
-            const eventsResponse = await fetch(`http://localhost:5000/api/event/thropies/${id}`, {
+            const eventsResponse = await fetch(`http://localhost:5000/api/event/trophies/${id}`, {
               method: 'GET',
               headers: {
                 'Authorization': `Bearer ${token}`,
@@ -125,21 +127,37 @@ const Trophies = () => {
 
             if (eventsResponse.ok) {
               const eventsData = await eventsResponse.json();
-
-              const filteredEvents = eventsData.filter(event => {
-                const userIdsArray = event.user_ids ? event.user_ids.split(',').map(id => parseInt(id, 10)) : [];
-                return userIdsArray.includes(id);
-              });
-
-              setEvents(filteredEvents);
+              // console.log('Odpowiedź z serwera (eventsData):', eventsData);
+            
+              // Sprawdzenie, czy odpowiedź zawiera komunikat o braku trofeów
+              if (eventsData.message === 'No trophies found') {
+                // console.log('Brak trofeów');
+                setEvents([]); // Możesz ustawić pustą tablicę, jeśli brak wyników
+              } else if (Array.isArray(eventsData)) {
+                // Jeśli eventsData jest tablicą, można wykonać filtrację
+                const filteredEvents = eventsData.filter(event => {
+                  const userIdsArray = event.user_ids ? event.user_ids.split(',').map(id => parseInt(id, 10)) : [];
+                  return userIdsArray.includes(id);
+                });
+                setEvents(filteredEvents);
+              } else {
+                console.error('Odpowiedź z serwera ma nieoczekiwany format', eventsData);
+                // setError('Odpowiedź serwera ma nieoczekiwany format');
+              }
             } else {
+              const errorDetails = await eventsResponse.text(); // Szczegóły błędu
+              console.log('Błąd trofeów:', eventsResponse.status, errorDetails);
               setError('events query/server error');
             }
           } else {
-            setError('user info query/server error');
+            const errorDetails = await userResponse.text(); // Szczegóły błędu
+    console.log('Błąd użytkownika:', userResponse.status, errorDetails);
+    setError('user info query/server error');
           }
         } catch (err) {
-          setError('query/server error');
+          console.log('Wystąpił błąd:', err);
+
+          setError('query/server error', err);
         }
       } else {
         navigate('/');

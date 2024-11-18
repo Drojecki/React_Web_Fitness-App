@@ -25,7 +25,7 @@ const Profile = () => {
     const token = localStorage.getItem('authToken');
 
     if (token) {
-      try {
+      // try {
         const decodedToken = jwtDecode(token);
         const id = decodedToken.id;
         const sessionKey = decodedToken.sessionKey;
@@ -40,14 +40,14 @@ const Profile = () => {
 
         if (userResponse.ok) {
           const userData = await userResponse.json();
-          setUser(userData[0]);
-          if (userData[0].is_banned === 1) {
+          setUser(userData);
+          if (userData.is_banned === 1) {
             navigate('/Banned');
           }
-          setProfilePicture(userData[0].profilePicture);
+          setProfilePicture(userData.profilePicture);
 
-          setEmailNotification(userData[0].email_notifications === 1 ? 'yes' : 'no');
-          setPushNotification(userData[0].push_notifications === 1 ? 'yes' : 'no');
+          setEmailNotification(userData.email_notifications === 1 ? 'yes' : 'no');
+          setPushNotification(userData.push_notifications === 1 ? 'yes' : 'no');
 
           const routesResponse = await fetch(`http://localhost:5000/api/users/${id}/routes`, {
             method: 'GET',
@@ -68,9 +68,10 @@ const Profile = () => {
           localStorage.removeItem('authToken');
           navigate('/');
         }
-      } catch (err) {
-        setError('query/server error');
-      }
+      // } catch (err) {
+      //   console.log(error);
+      //   setError('query/server error');
+      // }
     } else {
       navigate('/');
       setError('Token is required');
@@ -290,7 +291,7 @@ const Profile = () => {
                         <a href="/Profile" className='' style={{ textDecoration: 'none' }}>
                           {user && (previewUrl || user.profilePicture) ? (
                             <img
-                              src={previewUrl || `http://localhost/uploads/${user.profilePicture.split('/').pop()}`}
+                              src={previewUrl || `http://localhost:5000/uploads/${user.profilePicture.split('/').pop()}`}
                               alt="Profile"
                               className='w-[100px] h-[100px] rounded-[50%]'
                             />

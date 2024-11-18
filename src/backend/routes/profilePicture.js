@@ -1,15 +1,15 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const db = require('../config/db');
-const fs = require('fs');
+const { getDb } = require('../config/db');
+const fs = require('fs').promises; 
 
 const router = express.Router();
 
 //folder do zdjęć
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = 'C:/Users/Julas/Desktop/Xamp/htdocs/uploads';
+    const uploadPath = '/app/src/uploads';
     
     cb(null, uploadPath);
   },
@@ -24,84 +24,93 @@ const upload = multer({ storage });
 //wstawianie nowego / usuwanie starego zdjęcia profilowego
 router.post('/', upload.single('file'), async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
-    }
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Token is required' });
+  }
+  
   if (!req.file) {
-    return res.status(400).send('file missing');
+    return res.status(400).send('File missing');
   }
 
   const userId = req.body.userId;
 
-  const getUserQuery = 'SELECT profilePicture FROM users WHERE id = ?';
-  db.query(getUserQuery, [userId], async (err, results) => {
-    if (err) {
-      console.error('query error', err);
-      return res.status(500).send('server error');
+  try {
+    const db = await getDb();
+    const getUserQuery = 'SELECT profilePicture FROM users WHERE id = ?';
+    const [results] = await db.execute(getUserQuery, [userId]);
+
+    if (results.length === 0) {
+      return res.status(404).send('User not found');
     }
 
     const currentProfilePicturePath = results[0]?.profilePicture;
 
     if (currentProfilePicturePath) {
-      const oldPicturePath = path.join('C:/Users/Julas/Desktop/Xamp/htdocs/uploads', path.basename(currentProfilePicturePath));
+      const oldPicturePath = path.join('/app/src/uploads', path.basename(currentProfilePicturePath));
 
-      fs.unlink(oldPicturePath, (err) => {
-        if (err) {
-          console.error('error deleting old photo', err);
-          return res.status(500).send('error deleting old photo');
-        }
-        console.log('success photo deleted');
-      });
+      try {
+        await fs.unlink(oldPicturePath);
+        console.log('Success photo deleted');
+      } catch (err) {
+        console.error('Error deleting old photo', err);
+        // return res.status(500).send('Error deleting old photo');
+      }
     }
 
-    const newProfilePicturePath = `/uploads/${req.file.filename}`;
+    const newProfilePicturePath = `/app/src/uploads/${req.file.filename}`;
     const updateQuery = 'UPDATE users SET profilePicture = ? WHERE id = ?';
-    db.query(updateQuery, [newProfilePicturePath, userId], (err) => {
-      if (err) {
-        console.error('query error', err);
-        return res.status(500).send('server error');
-      }
-      res.status(200).send({ url: newProfilePicturePath });
-    });
-  });
+    await db.execute(updateQuery, [newProfilePicturePath, userId]);
+
+    res.status(200).send({ url: newProfilePicturePath });
+  } catch (err) {
+    console.error('Server error', err);
+    res.status(500).send('Server error');
+  }
 });
 
-//usuwanie zdjęcia profilowego
 router.delete('/', async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: 'Token is required' });
-    }
-  const userId = req.body.userId;
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Token is required' });
+  }
 
-  const getUserQuery = 'SELECT profilePicture FROM users WHERE id = ?';
-  db.query(getUserQuery, [userId], async (err, results) => {
-    if (err) {
-      console.error('query error', err);
-      return res.status(500).send('server error');
+  const { userId } = req.body;
+
+  try {
+    const db = await getDb();
+    const getUserQuery = 'SELECT profilePicture FROM users WHERE id = ?';
+    const [results] = await db.execute(getUserQuery, [userId]);
+
+    if (results.length === 0) {
+      return res.status(404).send('User not found');
     }
 
     const currentProfilePicturePath = results[0]?.profilePicture;
-    if (currentProfilePicturePath) {
-      fs.unlink(path.join('C:/Users/Julas/Desktop/Xamp/htdocs/uploads', path.basename(currentProfilePicturePath)), (err) => {
-        if (err) {
-          console.error('error deleting', err);
-          return res.status(500).send('error deleting');
-        }
 
-        const updateQuery = 'UPDATE users SET profilePicture = NULL WHERE id = ?';
-        db.query(updateQuery, [userId], (err) => {
-          if (err) {
-            console.error('query error', err);
-            return res.status(500).send('server error');
-          }
-          res.status(200).send('success');
-        });
-      });
+    if (currentProfilePicturePath) {
+      const oldPicturePath = path.join('/app/src/uploads', path.basename(currentProfilePicturePath));
+
+      try {
+        await fs.unlink(oldPicturePath);
+        console.log('Success: Photo deleted');
+      } catch (err) {
+        console.error('Error deleting photo', err);
+        return res.status(500).send('Error deleting photo');
+      }
+
+      const updateQuery = 'UPDATE users SET profilePicture = NULL WHERE id = ?';
+      await db.execute(updateQuery, [userId]);
+
+      res.status(200).send('Profile picture deleted successfully');
     } else {
-      res.status(400).send('error , photo missing');
+      res.status(400).send('Error: No photo to delete');
     }
-  });
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;
