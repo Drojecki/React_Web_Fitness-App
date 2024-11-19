@@ -5,7 +5,7 @@ let db;
 
 async function connectToDatabase() {
   try {
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise(resolve => setTimeout(resolve, 6000));
 
     db = await mysql.createConnection({
       host: 'db',
