@@ -4,20 +4,26 @@ require('dotenv').config();
 let db;
 
 async function connectToDatabase() {
-  try {
-    await new Promise(resolve => setTimeout(resolve, 6000));
+  const maxRetries = 5;
+  let retries = 0;
 
-    db = await mysql.createConnection({
-      host: 'db',
-      user: 'root',
-      password: 'password',
-      database: 'inzynierka'
-    });
+  while (retries < maxRetries) {
+    try {
+      db = await mysql.createConnection({
+        host: 'db',
+        user: 'root',
+        password: 'password',
+        database: 'inzynierka'
+      });
 
-    console.log('Połączono z bazą danych MySQL');
-  } catch (err) {
-    console.error('Błąd połączenia z bazą danych:', err);
-    throw err;
+      console.log('Połączono z bazą danych MySQL');
+      return;
+    } catch (err) {
+      retries++;
+      console.error(`Nieudana próba połączenia ${retries}/${maxRetries}`, err);
+      if (retries === maxRetries) throw err;
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
   }
 }
 
