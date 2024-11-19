@@ -28,7 +28,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: inzynierka
-      # - ./inzynierka.sql:/docker-entrypoint-initdb.d/inzynierka.sql:ro  # Automatyczne inicjowanie bazy danych
+    volumes:
+      - ./inzynierka.sql:/docker-entrypoint-initdb.d/inzynierka.sql:ro  # Automatyczne inicjowanie bazy danych
     ports:
       - "3307:3306"
     networks:
@@ -37,3 +38,4 @@ services:
 networks:
   app-network:
     driver: bridge
+
