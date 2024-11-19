@@ -46,9 +46,9 @@ const Login = () => {
   };
 
   return (
-    <div className='flex flex-col items-center justify-center w-full h-screen p-6 bg-gray-100'>
+    <div className='bg-[#84D49D] flex flex-col items-center justify-center w-full h-screen p-6 bg-gray-100'>
       <div className='mb-4 flex max-w-[300px] w-full justify-between items-center'>
-        <h2 className='text-2xl font-bold text-gray-700'>Login</h2>
+        <h2 className='text-2xl font-bold text-[#3B4A3F]'>Login</h2>
         {loginError && <p className='text-red-500'>{loginError}</p>}
       </div>
       <div className='max-w-[300px] w-full max-w-xs'>
@@ -75,7 +75,7 @@ const Login = () => {
           Need an account? Register now!
         </Link>
         <button
-          className='w-[100px] p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300'
+          className='bg-[#84D49D] w-[100px] p-2 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300'
           onClick={handleLogin}
         >
           Login
