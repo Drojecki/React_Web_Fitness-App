@@ -35,3 +35,6 @@ Password: 123
 ```
 ![Zrzut ekranu 2024-11-19 205415](https://github.com/user-attachments/assets/e14c5da3-b3ef-41c2-bb49-2d31353534ca)
 
+Alternatively, you can register your own account.
+
+HAVE FUN!!:)
