@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import Logo from './Components/img/earthLogo.png';
 import { Link, useNavigate } from 'react-router-dom';
+import LoginRegisterBackground from './Components/LoginRegisterBackground';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -46,42 +48,61 @@ const Login = () => {
   };
 
   return (
-    <div className='bg-[#84D49D] flex flex-col items-center justify-center w-full h-screen p-6 bg-gray-100'>
-      <div className='mb-4 flex max-w-[300px] w-full justify-between items-center'>
-        <h2 className='text-2xl font-bold text-[#3B4A3F]'>Login</h2>
-        {loginError && <p className='text-red-500'>{loginError}</p>}
-      </div>
-      <div className='max-w-[300px] w-full max-w-xs'>
-        <div className='flex flex-col mb-4'>
-          <input
-            className='p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-            placeholder='Username'
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <input
-            className='p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2'
-            type='password'
-            placeholder='Password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-        </div>
-      </div>
-      <div className='flex items-center max-w-[300px] w-full justify-between'>
-        <Link to='/register' className='text-blue-500 hover:underline text-xs'>
-          Need an account? Register now!
-        </Link>
-        <button
-          className='bg-[#84D49D] w-[100px] p-2 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300'
-          onClick={handleLogin}
-        >
-          Login
-        </button>
-      </div>
-    </div>
+    <>
+      <LoginRegisterBackground>
+      <div className='mb-4 flex max-w-[300px]'>
+            <h1 className='text-4xl font-bold text-[#3B4A3F]'>Welcome back</h1>
+          </div>
+
+          <div className='flex flex-row items-center max-w-[300px] w-full justify-center mb-5 space-x-2'>
+            <p className='font-medium text-[18px] text-[#3B4A3F]'>
+              New to EcoSphere?
+            </p>
+            <Link to='/register' className=' text-[#6E9B7B] font-bold text-[18px] underline'>
+              Register now!
+            </Link>
+          </div>
+          <div className='mb-5 flex max-w-[300px] w-full justify-center items-center'>
+            {loginError ? (
+              <p className='font-medium text-red-500 text-center'>{loginError}</p>
+            ) : (
+              <p className='invisible'>placeholder</p>
+            )}
+          </div>
+
+          <div className='max-w-[300px] w-full max-w-xs'>
+            <div className='flex flex-col mb-4'>
+              <label className="block mb-2 text-m font-medium text-[#3B4A3F]">Username</label>
+              <input
+                className='p-2 border mb-4 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#84D49D]'
+                placeholder='Enter your username'
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+              <label className="block  text-m font-medium text-[#3B4A3F] ">Password</label>
+              <input
+                className='p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#84D49D] mt-2'
+                type='password'
+                placeholder='Enter your password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+            </div>
+          </div>
+          <div className='flex items-center max-w-[300px] w-full justify-center'>
+
+            <button
+              className='w-[100px] p-2 bg-[#84D49D] text-xl font-medium text-white rounded-md hover:bg-[#6E9B7B] focus:outline-none'
+              onClick={handleLogin}
+            >
+              Login
+            </button>
+          </div>
+      </LoginRegisterBackground>
+    </>
+
   );
 };
 

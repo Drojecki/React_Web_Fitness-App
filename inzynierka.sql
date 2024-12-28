@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 18, 2024 at 08:09 PM
+-- Generation Time: Dec 28, 2024 at 09:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -146,6 +146,14 @@ CREATE TABLE `events` (
   `TrophyImage` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `events`
+--
+
+INSERT INTO `events` (`id`, `title`, `description`, `type`, `distance`, `image`, `created_at`, `startDate`, `endDate`, `status`, `user_ids`, `TrophyImage`) VALUES
+(96, 'Winter Running', 'Run 100 this month', 'run', 100.00, '../../public/uploads/chander-r-z4WH11FMfIQ-unsplash.jpg', '2024-12-13 15:50:21', '2024-12-01', '2024-12-31', 'active', '106', '../../public/uploads/chander-r-z4WH11FMfIQ-unsplash.jpg'),
+(97, 'Winter weekend', 'Cycle 75Km this weekend', 'bike', 75.00, '../../public/uploads/holly-chisholm-xZc2JgyU_Jg-unsplash.jpg', '2024-12-13 15:54:08', '2024-12-13', '2024-12-15', 'active', '106', '../../public/uploads/holly-chisholm-xZc2JgyU_Jg-unsplash.jpg');
+
 -- --------------------------------------------------------
 
 --
@@ -214,10 +222,9 @@ CREATE TABLE `notifications_popup` (
 --
 
 INSERT INTO `notifications_popup` (`id`, `content`, `created_at`, `header`) VALUES
-(23, '20% rabat w ten weekend', '2024-09-19 14:36:44', '20% rabat w ten weekend'),
-(28, '123', '2024-11-04 11:40:02', '321'),
-(29, '213321123231', '2024-11-04 11:40:04', '21332123'),
-(30, 'tetsesteststesetsetste', '2024-11-04 11:40:07', 'testsetettes');
+(33, 'Try eco-friendly travel today!', '2024-12-13 16:00:38', 'Take care of yourself and the planet'),
+(34, 'The start of the St. Nicholas Day event!', '2024-12-13 16:00:48', 'This Friday'),
+(35, 'Join those who work for change!', '2024-12-13 16:01:29', 'Sustainable transport is the future');
 
 -- --------------------------------------------------------
 
@@ -359,7 +366,8 @@ CREATE TABLE `transport_modes` (
 
 INSERT INTO `transport_modes` (`id`, `mode_name`, `description`) VALUES
 (1, 'Bicycle', 'Traveling by bicycle'),
-(2, 'Walking', 'Traveling by walking');
+(2, 'Walking', 'Traveling by walking'),
+(3, 'Running', 'Traveling by Running');
 
 -- --------------------------------------------------------
 
@@ -392,7 +400,7 @@ INSERT INTO `users` (`id`, `username`, `password_hash`, `email`, `age`, `gender`
 (1, 'mbarajaz0', '$2a$04$GZi2PWV0TmztyJO0oLT9FO4pQdBZCBUPuLhX6m5FkcNB43ZmhiSti', 'krobilart0@intel.com', 63, 'M', '2024-08-08 20:02:33', '2024-08-08 20:02:33', 1, NULL, 1, 1, NULL, 0),
 (2, 'rshimon1', '$2a$04$B8SUJxSJHsX4HakGaF07RuKar8fxE1Vs.BspwpM4AuCwg80k9m3wS', 'dkissack1@last.fm', 1, 'F', '2024-08-08 20:02:33', '2024-08-08 20:02:33', 0, NULL, 1, 1, NULL, 0),
 (3, 'flushey2', '$2a$04$Q/IA8lgW4hvtc30mKS1.7.28BfviUwSitqjMlOWypm09bAjArdHRS', 'lcabble2@house.gov', 91, 'F', '2024-08-08 20:02:33', '2024-08-08 20:02:33', 1, NULL, 1, 1, NULL, 0),
-(4, 'lpauwel3', '$2a$04$rZcVEiwh3gLJb5xwdLb6XuW2r8EQ1qeys4jyX61FsB7Nn2AXTBppy', 'lpudding3@newyorker.com', 33, 'M', '2024-08-08 20:02:33', '2024-08-08 20:02:33', 0, NULL, 1, 1, NULL, 0),
+(4, 'lpauwel3', '$2a$04$rZcVEiwh3gLJb5xwdLb6XuW2r8EQ1qeys4jyX61FsB7Nn2AXTBppy', 'lpudding3@newyorker.com', 33, 'M', '2024-08-08 20:02:33', '2024-08-08 20:02:33', 1, NULL, 1, 1, NULL, 0),
 (5, 'phuddles4', '$2a$04$BnR7vxRgx/VEcHljr2L.5OJKLLvzN8kJ8fpxpSUriLwCYqvuJTgP6', 'pscuse4@ovh.net', 66, 'F', '2024-08-08 20:02:33', '2024-08-08 20:02:33', 1, NULL, 1, 1, NULL, 0),
 (6, 'egerish5', '$2a$04$S6bAzBG7orteRELkia7avOA2H.rZmO.pe26ZOSRkLdbyi0hLAEZvK', 'lfriar5@g.co', 11, 'F', '2024-08-08 20:02:33', '2024-08-08 20:02:33', 0, NULL, 1, 1, NULL, 0),
 (7, 'lkirtley6', '$2a$04$DNAK4kBrCQSH6Z247/1KHetlmAoZ0JVTE/FcSbZCCVZ0lGpBD0IZm', 'rstorey6@cbsnews.com', 65, 'M', '2024-08-08 20:02:33', '2024-08-08 20:02:33', 0, NULL, 1, 1, NULL, 0),
@@ -421,14 +429,14 @@ INSERT INTO `users` (`id`, `username`, `password_hash`, `email`, `age`, `gender`
 (44, 'marek', '$2b$10$SNQIwyR7QYRxHhyU5954Au9otzo8ufoNBc2J26SxUvcWy0THY9nK6', 'marek@marek.pl', 18, 'M', '2024-08-13 10:48:38', '2024-08-13 08:48:38', 0, NULL, 1, 1, NULL, 0),
 (45, '123', '123', '123@123', 20, 'M', '2024-08-13 10:38:16', '2024-08-13 10:38:16', 0, NULL, 1, 1, NULL, 0),
 (47, 'sdsadas', '$2b$10$oGijqPa1jXToobCQ7cwd8Ocw/7omuH/o5R6uWhKEEibvuHkS0xIaS', '123@123.pl', 66, 'M', '2024-08-13 12:40:26', '2024-08-13 10:40:26', 0, NULL, 1, 1, NULL, 0),
-(48, '321', '$2b$10$j50LlsAFXDqRapodAcN1A.44N3/q6vPWzwDWR.OjDinni3cYOJPym', '321@123', 20, 'M', '2024-08-13 10:56:54', '2024-08-13 10:56:54', 0, '', 1, 1, '051ad99e96df187afa2757b7827358bb4ad892e964ea80825b3166752d112bf9e993bc99d4e3b0d38e1c02cf37caa049acb619546c1f63fd1980fe6d02c2297e', 1),
+(48, '321', '$2b$10$j50LlsAFXDqRapodAcN1A.44N3/q6vPWzwDWR.OjDinni3cYOJPym', '321@123', 20, 'M', '2024-08-13 10:56:54', '2024-08-13 10:56:54', 0, '/uploads/1734887267955-FirstImg.jpg', 1, 1, '5b294da66c9738ae03b3badab25735b2efc668c4ad2ccabe92423779e207b488fca0ae346703d908728acdb9d14b5872b105b3c042ea4717419ea91c8ad780ab', 1),
 (49, 'amrekawe', '$2b$10$0gCOTofH27vV8NsGKZQpOOozzSA7Sq.bpwczQnRd1954iWzI44Wu.', 'qwer@wer.pl', 32, 'M', '2024-08-13 13:12:36', '2024-08-13 11:12:36', 0, NULL, 1, 1, NULL, 0),
-(52, 'MarekMarek', '$2b$10$CrFg7KDZeJwrHOd2Br.43upURlQ2yi2xu8/4CsNXdd0wizwHCLIVO', 'jule111k@julek.pl', 19, 'M', '2024-08-13 23:10:18', '2024-08-13 21:10:19', 0, '', 0, 0, 'cc289a83be1175344e93ccfbb1aa871fcace45f817e828285501a491f9293e05f504bc2670e1f2b7cec45fa66d7482f4baf813dcaab5cb206e0c95ba43634d01', 1),
+(52, 'MarekMarek', '$2b$10$CrFg7KDZeJwrHOd2Br.43upURlQ2yi2xu8/4CsNXdd0wizwHCLIVO', 'jule111k@julek.pl', 19, 'M', '2024-08-13 23:10:18', '2024-08-13 21:10:19', 0, '/uploads/1734105450343-ThirdImg.jpg', 0, 0, 'a550e0eb4041047ace563034a11f1e5d3880075cac754c2004ca8c91a09fbb293f7a6db6244ad4a908ff3557731ca0ccc4c28004c58a58625a7eda07fb318499', 1),
 (53, 'qwwerty', '$2b$10$pM4v0e6a1fYICUiEitQIAen6Y6ApZnDI1QMN3AacTcKtrXPz/mMEC', 'hfvjhaskj@msdaf.ps', 45, 'F', '2024-08-13 23:48:22', '2024-08-13 21:48:22', 0, NULL, 1, 1, NULL, 0),
-(54, 'Fifi', '$2b$10$221LtnADl5RTKGdYMhKCK.8u14dC8vTsIZfRADgQMDN.vjgG8UInm', 'niktCieNieKocha@Dzięki.pl', 30, 'M', '2024-08-24 17:13:26', '2024-08-24 15:13:30', 0, NULL, 1, 1, '768f0c0461b371de11ba79eb36932fe80c129b67bf7e00a5f17f72ea77ab4ba8cbfbdbf92902da5ab4ad565f1296262a7ac5b13c4cba46d5147707333d42d741', 0),
+(54, 'Fifi', '$2b$10$221LtnADl5RTKGdYMhKCK.8u14dC8vTsIZfRADgQMDN.vjgG8UInm', 'niktCieNieKocha@Dzięki.pl', 30, 'M', '2024-08-24 17:13:26', '2024-08-24 15:13:30', 0, '/uploads/1734105476253-SecondImg.jpg', 1, 1, '814a0f854fd751cbd71f94bbe660bca30178efafef66d9d72a96da2bb9624ccf66a2fa1948b077a32b5c6eadeb5bbd7e5221e5bcf70be75ebcfaf1ed5bfe949b', 0),
 (67, 'qweqweqwe', '$2b$10$IathYXWJFkSKbJn0k0j0punyd84dKsg2aJpMobqLkv0kFoxi4UpfG', 'qweqwe@qwe.qwe', 67, 'M', '2024-09-11 19:36:38', '2024-09-11 17:36:37', 0, NULL, 1, 1, NULL, 0),
 (71, 'hbydsfvijh', '$2b$10$qWdWCECvCImV/1oSQI7Wm.gvJRxjv/JE5Egappo.JRTG4pwVw/MhS', 'fajsuhgfihsdi123@aidug.12', 44, 'M', '2024-09-11 19:50:34', '2024-09-11 17:50:33', 0, NULL, 1, 1, NULL, 0),
-(73, 'MarekMarekMarek', '$2b$10$MpxeeEc8YdXRWexwdwmFGOCDLuLTAD4nMMtasDS/NStnJmage3ZZG', '123@12223.pl', 20, 'M', '2024-09-11 23:30:14', '2024-09-11 21:30:15', 0, '', 1, 1, 'd35eaf05815a532362e093fd316fa3eb6b44b9ca0d8d295ac8ee744efd0af8cbe6f8c9bcf6791ad7dfa55c561c582434591c8a712e9c9d518401c95291a8d667', 1),
+(73, 'MarekMarekMarek', '$2b$10$MpxeeEc8YdXRWexwdwmFGOCDLuLTAD4nMMtasDS/NStnJmage3ZZG', '123@12223.pl', 20, 'M', '2024-09-11 23:30:14', '2024-09-11 21:30:15', 0, '', 1, 1, '50b196b5600b97760794b35ce148b7d3ae3694c9137192424dd746fbf1b51c9ce13bfe5307369f6bf6efe8915e077a0914454dc11ff8b0ec3d5dca61da833945', 1),
 (74, 'AniaAnia', '$2b$10$DAkQU5WuqLGlbH1IbaDa2uWZwCjJjkZP5sUoWNN7xNR/5VY25.X0O', 'Ania@Ania.Ania', 60, 'F', '2024-09-16 13:25:27', '2024-09-16 11:25:26', 1, NULL, 1, 1, '9befe289ce4c089bc5f77e093f82cc2b8472924e719cf4d32997ed83c38254211fa5cc07b7cb051b8aa689fac246323d3e539b059d23706b1524572f2049b436', 0),
 (75, 'skdamflask', '$2b$10$kteMj/Ldf3R4mT6zul4NK.D.gRNfj/A6VXr3BwWf3N7cQrECw6X36', 'ajfdoisajdf@ea.r', 44, 'M', '2024-09-16 21:48:42', '2024-09-16 19:48:42', 0, NULL, 1, 1, NULL, 0),
 (77, 'pidsahjfojashfo', '$2b$10$s8.tSu7AqZ57LeqP7yijUusbcz4u2McyO43BM5VYmdTJK.3i1PaHW', 'apfijhaso1@sa.a', 33, 'M', '2024-09-16 21:59:53', '2024-09-16 19:59:52', 0, NULL, 1, 1, NULL, 0),
@@ -451,7 +459,8 @@ INSERT INTO `users` (`id`, `username`, `password_hash`, `email`, `age`, `gender`
 (101, 'test', '$2b$10$WC70D04ppHG6yrXo3fBeDez2tjVnoTkGn6QHSolT3OIQl5onorWDu', '123@sad.pl', 32, 'M', '2024-11-02 18:48:06', '2024-11-02 18:48:06', 0, NULL, 1, 1, NULL, 0),
 (103, 'testxd', '$2b$10$M0PWAozO34AYs1fuHBsxyeH9jItCfoDrNf0DRIeUkAbHgVsufcqr2', 'test@test.pl', 23, 'M', '2024-11-02 21:01:13', '2024-11-02 21:01:13', 0, NULL, 1, 1, 'f4124e00aff55165c271afee3f08feb527f89ff9ec198c674689f54636080f1959e865b7303836f7d296778dfd3f7c8d5dae1113127f317f9223212ad8346fb3', 0),
 (104, 'testxdxd', '$2b$10$vIbFI7bDOwfehdCYpu2qzOOpXivRpPdtIcJkFR3W928emtxpcQaB2', 'test@test.ig', 32, 'F', '2024-11-02 21:08:25', '2024-11-02 21:08:25', 1, NULL, 1, 1, '99ca1c8c6f60b1ee5d12b6e3af06f0a70bd889951691184d492129b09d97d4ad794868b8a37ddbe9be03b24899d20a88cd54c86cc240cfdc5ad4a2c4bd783dc0', 0),
-(105, 'testczxcxz', '$2b$10$4N2W4hobwtPRN0PhHPODTOiLtQkC0GvvnVQzVjxEBYGDDKXiQk5DS', '123@123.pll', 32, 'F', '2024-11-03 17:08:29', '2024-11-03 17:08:29', 0, NULL, 1, 1, NULL, 0);
+(105, 'testczxcxz', '$2b$10$4N2W4hobwtPRN0PhHPODTOiLtQkC0GvvnVQzVjxEBYGDDKXiQk5DS', '123@123.pll', 32, 'F', '2024-11-03 17:08:29', '2024-11-03 17:08:29', 0, NULL, 1, 1, NULL, 0),
+(106, 'JohnWick', '$2b$10$GdbYmeEcA836r11ns/Z7q.gnKVoVvudblZ3wQ6i0Lh2yo/JtS9hdK', 'John@Wick.pl', 25, 'M', '2024-12-13 15:23:29', '2024-12-13 15:23:29', 0, NULL, 0, 0, '7b055029453c79dfdd59d301c7bb191cdacdf6f5acf1d2f34eccacff1d0c6808f64a4716f2a308d24d8843798db3bef43edeecbaa2c975218e37a9eb66c36af7', 0);
 
 -- --------------------------------------------------------
 
@@ -550,8 +559,8 @@ INSERT INTO `user_routes` (`id`, `user_id`, `transport_mode_id`, `distance_km`, 
 (72, 48, 1, 50, '2024-09-10 20:53:58', 2.5, 50, '00:30:00', 15, 1),
 (73, 52, 1, 5, '2024-09-11 10:05:00', 2.5, 50, '00:30:00', 15, 1),
 (74, 48, 1, 10.5, '2024-09-11 17:09:54', 2.5, 50, '00:30:00', 15, 1),
-(75, 48, 1, 25000, '2024-09-11 17:10:49', 2.5, 50, '00:30:00', 15, 1),
-(76, 48, 1, 25000, '2024-09-11 17:11:03', 2.5, 50, '00:30:00', 15, 1),
+(75, 48, 1, 120, '2024-09-11 17:10:49', 2.5, 50, '00:30:00', 15, 1),
+(76, 48, 1, 130, '2024-09-11 17:11:03', 2.5, 50, '00:30:00', 15, 1),
 (77, 48, 2, 1000, '2024-09-11 21:01:49', 2.5, 50, '00:30:00', 15, 1),
 (78, 52, 2, 1000, '2024-09-11 21:27:09', 2.5, 50, '00:30:00', 15, 1),
 (79, 73, 2, 1000, '2024-09-11 21:34:21', 2.5, 50, '00:30:00', 15, 1),
@@ -644,9 +653,9 @@ INSERT INTO `user_routes` (`id`, `user_id`, `transport_mode_id`, `distance_km`, 
 (166, 54, 1, 0.14, '2024-10-15 17:07:05', 17.37, 7, '00:00:29', 0.07, 0),
 (167, 54, 1, 0.14, '2024-10-15 17:07:05', 17.37, 7, '00:00:29', 0.07, 0),
 (168, 48, 1, 10.5, '2024-10-16 17:35:11', 2.5, 50, '00:30:00', 15, 1),
-(169, 48, 2, 10000, '2024-10-16 17:36:24', 2.5, 50, '00:30:00', 15, 1),
-(170, 48, 2, 1000000, '2024-10-16 17:37:14', 2.5, 50, '00:30:00', 15, 1),
-(171, 48, 2, 100000000, '2024-10-16 17:37:54', 2.5, 50, '00:30:00', 15, 1),
+(169, 48, 2, 100, '2024-10-16 17:36:24', 2.5, 50, '00:30:00', 15, 1),
+(170, 48, 2, 100, '2024-10-16 17:37:14', 2.5, 50, '00:30:00', 15, 1),
+(171, 48, 2, 100, '2024-10-16 17:37:54', 2.5, 50, '00:30:00', 15, 1),
 (172, 48, 1, 0.2, '2024-10-21 19:40:12', 24.36, 10, '00:00:41', 0.1, 0),
 (173, 48, 1, 0, '2024-10-27 19:06:49', 0, 0, '00:00:04', 0, 0),
 (174, 48, 1, 0, '2024-10-27 19:30:46', 0, 0, '00:01:31', 0, 0),
@@ -659,7 +668,25 @@ INSERT INTO `user_routes` (`id`, `user_id`, `transport_mode_id`, `distance_km`, 
 (181, 48, 1, 100, '2024-11-07 16:40:31', 2.5, 50, '00:30:00', 15, 1),
 (182, 52, 1, 100, '2024-11-07 16:43:04', 2.5, 50, '00:30:00', 15, 1),
 (183, 48, 1, 10.5, '2024-11-12 21:43:08', 2.5, 50, '00:30:00', 15, 1),
-(184, 48, 2, 50, '2024-11-12 21:49:56', 2.5, 50, '00:30:00', 15, 1);
+(184, 48, 2, 50, '2024-11-12 21:49:56', 2.5, 50, '00:30:00', 15, 1),
+(185, 48, 2, 50, '2024-11-26 19:45:12', 2.5, 50, '00:30:00', 15, 1),
+(186, 48, 1, 50, '2024-11-26 19:45:43', 2.5, 50, '00:30:00', 15, 1),
+(187, 48, 1, 50, '2024-11-26 19:46:05', 2.5, 50, '00:30:00', 15, 1),
+(189, 48, 3, 125, '2024-12-10 16:32:25', 2.5, 50, '00:30:00', 15, 1),
+(190, 48, 1, 40, '2024-12-12 13:36:26', 2.5, 50, '00:30:00', 15, 1),
+(191, 48, 1, 10, '2024-12-12 13:36:38', 2.5, 50, '00:30:00', 15, 1),
+(192, 106, 1, 15, '2024-12-04 23:00:00', 2.5, 50, '00:30:00', 15, 1),
+(193, 106, 1, 20.3, '2024-11-14 23:00:00', 2.5, 50, '00:30:00', 15, 1),
+(194, 106, 2, 25.35, '2024-12-08 23:00:00', 2.5, 50, '00:30:00', 15, 1),
+(195, 106, 3, 15, '2024-12-09 23:00:00', 5, 140, '00:20:00', 15, 1),
+(196, 106, 1, 7.5, '2024-12-10 23:00:00', 5, 242, '00:20:00', 2.2, 1),
+(197, 106, 1, 10.8, '2024-12-11 23:00:00', 5, 242, '00:20:00', 2.2, 1),
+(198, 106, 1, 17.5, '2024-12-12 23:00:00', 5, 242, '00:40:00', 11.2, 1),
+(199, 106, 2, 17.5, '2024-12-09 00:00:00', 5, 242, '00:40:00', 11.2, 1),
+(200, 106, 3, 17.5, '2024-12-08 23:00:00', 5, 242, '00:40:00', 11.2, 1),
+(201, 106, 1, 42.2, '2024-12-07 23:00:00', 5.5, 2000, '00:30:00', 150, 1),
+(202, 106, 1, 10, '2024-12-06 23:00:00', 5.5, 230, '00:30:00', 32, 1),
+(203, 106, 2, 75, '2024-12-14 19:40:18', 2.5, 50, '00:30:00', 15, 1);
 
 -- --------------------------------------------------------
 
@@ -871,7 +898,7 @@ ALTER TABLE `comments`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT for table `friends`
@@ -889,7 +916,7 @@ ALTER TABLE `likes`
 -- AUTO_INCREMENT for table `notifications_popup`
 --
 ALTER TABLE `notifications_popup`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `notifictions`
@@ -913,19 +940,19 @@ ALTER TABLE `tickets`
 -- AUTO_INCREMENT for table `transport_modes`
 --
 ALTER TABLE `transport_modes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
 
 --
 -- AUTO_INCREMENT for table `user_routes`
 --
 ALTER TABLE `user_routes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=185;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=204;
 
 --
 -- Constraints for dumped tables

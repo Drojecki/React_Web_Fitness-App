@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
-import Sidebar from './Components/Sidebar';
 import '../css/stats.css';
 import Header from './Components/Header';
 import { jwtDecode } from "jwt-decode";
 import TrophyList from './Components/TrophyList';
-import confetti from "canvas-confetti";
 import { useNavigate } from 'react-router-dom';
+import BackGround from './Components/BackGround';
+import ModalInfo from './Components/ModalInfo';
 
 const Trophies = () => {
-  const [userRoutes, setUserRoutes] = useState([]);
   const [runningDistance, setRunningDistance] = useState(0);
   const [cyclingDistance, setCyclingDistance] = useState(0);
+  const [walkingDistance, setWalkingDistance] = useState(0);
   const [Co2Saved, setCo2Saved] = useState(0);
   const [CaloriesBurned, setCaloriesBurned] = useState(0);
   const [MoneySaved, setMoneySaved] = useState(0);
@@ -24,38 +24,25 @@ const Trophies = () => {
   const popupRef = useRef(null);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [EventsOpen, setEventsOpen] = useState(true);
   const navigate = useNavigate();
 
-  const triggerConfetti = () => {
-    confetti({
-      particleCount: 100,
-      spread: 360,
-      origin: { y: 0.6 },
-      colors: ['#ff0', '#0f0', '#00f', '#f00', '#0ff', '#f0f'],
-      scalar: 2,
-    });
-  };
-
-  const handleTrophyEventClickConfetti = () => {
-    triggerConfetti();
-  };
-
-  const getTrophyLevel = (distance) => {
-    if (distance >= 100) return { level: 5, color: 'gold', next: 0 };
-    if (distance >= 75) return { level: 4, color: 'silver', next: 100 - distance };
-    if (distance >= 50) return { level: 3, color: 'bronze', next: 75 - distance };
-    if (distance >= 20) return { level: 2, color: 'blue', next: 50 - distance };
-    if (distance >= 10) return { level: 1, color: 'green', next: 20 - distance };
-    return { level: 0, color: 'grey', next: 10 - distance };
+  const getTrophyLevel = (distance , thresholds) => {
+    if (distance >= thresholds[4]) return { level: 5,  next: 0 };
+    if (distance >= thresholds[3]) return { level: 4,  next: thresholds[4] - distance };
+    if (distance >= thresholds[2]) return { level: 3,  next: thresholds[3] - distance };
+    if (distance >= thresholds[1]) return { level: 2,  next: thresholds[2] - distance };
+    if (distance >= thresholds[0]) return { level: 1, next: thresholds[1] - distance };
+    return { level: 0, next: thresholds[0] - distance };
   };
 
   const getTrophyLevelForStats = (value, thresholds) => {
-    if (value >= thresholds[4]) return { level: 5, color: 'gold', next: 0 };
-    if (value >= thresholds[3]) return { level: 4, color: 'silver', next: thresholds[4] - value };
-    if (value >= thresholds[2]) return { level: 3, color: 'bronze', next: thresholds[3] - value };
-    if (value >= thresholds[1]) return { level: 2, color: 'blue', next: thresholds[2] - value };
-    if (value >= thresholds[0]) return { level: 1, color: 'green', next: thresholds[1] - value };
-    return { level: 0, color: 'grey', next: thresholds[0] - value };
+    if (value >= thresholds[4]) return { level: 5,  next: 0 };
+    if (value >= thresholds[3]) return { level: 4,  next: thresholds[4] - value };
+    if (value >= thresholds[2]) return { level: 3,  next: thresholds[3] - value };
+    if (value >= thresholds[1]) return { level: 2,  next: thresholds[2] - value };
+    if (value >= thresholds[0]) return { level: 1,  next: thresholds[1] - value };
+    return { level: 0, next: thresholds[0] - value };
   };
 
   useEffect(() => {
@@ -93,13 +80,15 @@ const Trophies = () => {
 
             if (routesResponse.ok) {
               const routesData = await routesResponse.json();
-              setUserRoutes(routesData);
 
               const runningDistance = routesData
                 .filter(route => route.transport_mode_id === 1)
                 .reduce((acc, route) => acc + route.distance_km, 0);
               const cyclingDistance = routesData
                 .filter(route => route.transport_mode_id === 2)
+                .reduce((acc, route) => acc + route.distance_km, 0);
+              const walkingDistance = routesData
+                .filter(route => route.transport_mode_id === 3)
                 .reduce((acc, route) => acc + route.distance_km, 0);
 
               const totalCo2Saved = routesData.reduce((acc, route) => acc + route.CO2, 0);
@@ -108,12 +97,11 @@ const Trophies = () => {
 
               setRunningDistance(runningDistance);
               setCyclingDistance(cyclingDistance);
+              setWalkingDistance(walkingDistance);
               setCo2Saved(totalCo2Saved);
               setCaloriesBurned(totalCaloriesBurned);
               setMoneySaved(totalMoneySaved);
             } else {
-              const errorDetails = await routesResponse.text(); // Szczegóły błędu
-      console.log('Błąd tras:', routesResponse.status, errorDetails);
               localStorage.removeItem('authToken');
               navigate('/');
             }
@@ -127,37 +115,29 @@ const Trophies = () => {
 
             if (eventsResponse.ok) {
               const eventsData = await eventsResponse.json();
-              // console.log('Odpowiedź z serwera (eventsData):', eventsData);
-            
-              // Sprawdzenie, czy odpowiedź zawiera komunikat o braku trofeów
-              if (eventsData.message === 'No trophies found') {
-                // console.log('Brak trofeów');
-                setEvents([]); // Możesz ustawić pustą tablicę, jeśli brak wyników
-              } else if (Array.isArray(eventsData)) {
-                // Jeśli eventsData jest tablicą, można wykonać filtrację
-                const filteredEvents = eventsData.filter(event => {
+              if (eventsData && typeof eventsData === 'object') {
+                const eventsArray = Array.isArray(eventsData) ? eventsData : []; 
+                
+                const filteredEvents = eventsArray.filter(event => {
                   const userIdsArray = event.user_ids ? event.user_ids.split(',').map(id => parseInt(id, 10)) : [];
                   return userIdsArray.includes(id);
                 });
+              
                 setEvents(filteredEvents);
               } else {
-                console.error('Odpowiedź z serwera ma nieoczekiwany format', eventsData);
-                // setError('Odpowiedź serwera ma nieoczekiwany format');
+                console.error('Invalid eventsData format:', eventsData);
               }
             } else {
-              const errorDetails = await eventsResponse.text(); // Szczegóły błędu
-              console.log('Błąd trofeów:', eventsResponse.status, errorDetails);
               setError('events query/server error');
             }
           } else {
-            const errorDetails = await userResponse.text(); // Szczegóły błędu
-    console.log('Błąd użytkownika:', userResponse.status, errorDetails);
-    setError('user info query/server error');
+            setError('user info query/server error');
           }
         } catch (err) {
-          console.log('Wystąpił błąd:', err);
-
-          setError('query/server error', err);
+          const errorMessage = err.response
+            ? `Server Error: ${err.response.status} - ${err.response.statusText}`
+            : `Client Error: ${err.message}`;
+          setError(errorMessage || 'query/server error ');
         }
       } else {
         navigate('/');
@@ -174,10 +154,6 @@ const Trophies = () => {
   };
   const handleTrophyEventClick = (event) => {
     setSelectedEvent(event);
-    handleTrophyEventClickConfetti();
-  };
-  const handleCloseEventModal = () => {
-    setSelectedEvent(null);
   };
   useEffect(() => {
     document.body.className = theme;
@@ -189,8 +165,9 @@ const Trophies = () => {
     localStorage.setItem('theme', theme);
   };
 
-  const runningTrophy = getTrophyLevel(runningDistance);
-  const cyclingTrophy = getTrophyLevel(cyclingDistance);
+  const runningTrophy = getTrophyLevel(runningDistance, [15, 50, 150, 350, 500]);
+  const cyclingTrophy = getTrophyLevel(cyclingDistance, [15, 50, 150, 350, 500]);
+  const walkingTrophy = getTrophyLevel(walkingDistance, [15, 50, 150, 350, 500]);
 
   const co2Trophy = getTrophyLevelForStats(Co2Saved, [10, 20, 50, 75, 100]);
   const caloriesTrophy = getTrophyLevelForStats(CaloriesBurned, [1000, 2000, 5000, 7500, 10000]);
@@ -201,42 +178,50 @@ const Trophies = () => {
     switch (trophyType) {
       case 'running':
         content = {
-          title: '🏃‍♂️ Running',
+          title: 'Running',
           level: runningTrophy.level,
           detail: `Distance covered: ${runningDistance.toFixed(2)} km`,
-          fact: 'Running improves cardiovascular and lung health.',
+          fact: runningTrophy.level < 5 ? `Next threshold: Level ${runningTrophy.level + 1}- ${runningTrophy.next.toFixed(2)} km left` : 'Amazing! You`ve conquered all levels!',
+        };
+        break;
+      case 'walking':
+        content = {
+          title: 'Walking',
+          level: walkingTrophy.level,
+          detail: `Distance covered: ${walkingDistance.toFixed(2)} km`,
+          fact: walkingTrophy.level < 5 ? `Next threshold: Level ${walkingTrophy.level + 1}; ${walkingTrophy.next.toFixed(2)} km left` : 'Congrats! You`ve completed all levels!',
         };
         break;
       case 'cycling':
         content = {
-          title: '🚴‍♂️ Cycling',
+          title: 'Cycling',
           level: cyclingTrophy.level,
           detail: `Distance covered: ${cyclingDistance.toFixed(2)} km`,
-          fact: 'Cycling is great exercise for the lower body.',
+          fact: cyclingTrophy.level < 5 ? `Next threshold: Level ${cyclingTrophy.level + 1}; ${cyclingTrophy.next.toFixed(2)} km left` : 'All levels finished! Great job!',
         };
         break;
       case 'co2':
         content = {
-          title: '🌍 CO2 Savings',
+          title: 'CO2 Savings',
           level: co2Trophy.level,
           detail: `CO2 saved: ${Co2Saved.toFixed(2)} kg`,
-          fact: 'Saving CO2 helps combat climate change.',
+          fact: co2Trophy.level < 5 ? `Next threshold: Level ${co2Trophy.level + 1}; ${co2Trophy.next.toFixed(0)} kg left` : 'Mission complete! All levels done!',
         };
         break;
       case 'calories':
         content = {
-          title: '🔥 Calories Burned',
+          title: 'Calories Burned',
           level: caloriesTrophy.level,
           detail: `Calories burned: ${CaloriesBurned.toFixed(2)} kcal`,
-          fact: 'Burning calories improves overall body fitness.',
+          fact: caloriesTrophy.level < 5 ? `Next threshold: Level ${caloriesTrophy.level + 1} - ${caloriesTrophy.next.toFixed(0)} kcal left` : 'Congrats! All levels achieved!',
         };
         break;
       case 'money':
         content = {
-          title: '💸 Money Saved',
+          title: 'Money Saved',
           level: moneyTrophy.level,
-          detail: `Money saved: ${MoneySaved.toFixed(2)} zł`,
-          fact: 'Saving money allows for future investments.',
+          detail: `Money saved: ${MoneySaved.toFixed(2)} PLN`,
+          fact: moneyTrophy.level < 5 ? `Next threshold: Level ${moneyTrophy.level + 1}; ${moneyTrophy.next.toFixed(0)} money left` : 'You`re a master! All levels completed!',
         };
         break;
       default:
@@ -265,71 +250,91 @@ const Trophies = () => {
     };
   }, [popupVisible, selectedEvent]);
 
+  function OpenEvents() {
+    setEventsOpen(!EventsOpen);
+  }
+
   if (loading) return <p>Ładowanie...</p>;
   if (error) return <p>Błąd: {error}</p>;
 
   return (
 
-    <div className='w-full h-full min-h-screen bg-[#6E9B7B] content-center'>
-      <div className='flex w-full max-w-[1440px] min-h-[800px]  h-full justify-self-center gap-[10px] p-[10px]'>
-        <div className='w-[20%] max-w-[120px]  rounded-[10px] bg-[#D9EDDF] justify-items-center max-h-[760px]'>
-          <Sidebar />
-        </div>
-        <div className='scrollbar-hide flex w-[100%] bg-[#D9EDDF] max-h-[760px] rounded-[10px] overflow-y-scroll justify-center'>
-          <div className='flex justify-start min-h-screeen items-center flex-col w-full max-w-[1600px] justify-self-center'>
-            <Header
-              user={user}
-              theme={theme}
-              toggleTheme={toggleTheme}
-              toggleSidebar={toggleSidebar}
-            />
-            <h2>🏅 Your Trophies 🏅</h2>
+    <BackGround>
+      <div className='scrollbar-hide flex w-[100%] bg-[#D9EDDF] max-h-[760px] rounded-[10px] overflow-y-scroll justify-center'>
+        <div className=' flex justify-start min-h-screeen items-center flex-col w-full max-w-[1600px] justify-self-center relative'>
+          <Header
+            user={user}
+            theme={theme}
+            toggleTheme={toggleTheme}
+            toggleSidebar={toggleSidebar}
+          />
+          <div className='w-[170px] h-[40px] absolute top-[20px] left-1/2 -translate-x-1/2 CustomXXSM:top-[90px]'>
+            <button onClick={OpenEvents} className='w-[170px] h-[40px] bg-[#84D49D] text-white rounded-[20px] hover:scale-105'>{EventsOpen ? 'Show event trophies' : 'Show level trophies'}</button>
+          </div>
+          {EventsOpen ? (
             <div className="">
+              <TrophyList
+                runningDistance={runningDistance}
+                walkingDistance={walkingDistance}
+                cyclingDistance={cyclingDistance}
+                Co2Saved={Co2Saved}
+                CaloriesBurned={CaloriesBurned}
+                MoneySaved={MoneySaved}
+                handleTrophyClick={handleTrophyClick}
+                cyclingTrophy={cyclingTrophy}
+                runningTrophy={runningTrophy}
+                moneyTrophy={moneyTrophy}
+                caloriesTrophy={caloriesTrophy}
+                co2Trophy={co2Trophy}
+                walkingTrophy={walkingTrophy}
+              />
+              
+            </div>
+          ) : (
+            <div className="mt-[20px] ">
               {events.length > 0 && (
-                <ul className="flex">
+                <ul className="flex gap-[20px]">
                   {events.map(event => (
-                    <li key={event.id} className="hover:scale-105 hover:cursor-pointer " onClick={() => handleTrophyEventClick(event)}>
-                      <img className='w-[100px] h-[100px] m-auto rounded-[50%] border-black border-[2px]' src={`http://localhost/uploads/${event.TrophyImage.split('/').pop()}`} alt={event.title} />
+                    <li key={event.id} className=" hover:scale-105 hover:cursor-pointer" onClick={() => handleTrophyEventClick(event)}>
+                      <div className='flex w-[350px] h-[150px] bg-white rounded-[12px]'>
+                        <img className='w-[150px] h-[150px] rounded-[12px] shadow-[0px_4px_4px_rgba(11,14,52,0.20)]' src={`http://localhost:5000/uploads/${event.TrophyImage.split('/').pop()}`} alt={event.title} />
+                        <div className='justify-items-center m-auto p-[10px]'>
+                          <p className='font-semibold text-center content-center'>{event.title}</p>
+                          <p className='font-500 text-center content-center'>{event.description}</p>
+                          <button className='w-[130px] h-[40px] bg-[#84D49D] text-white rounded-[20px] mt-[10px]'>Achived!</button>
+                        </div>
+                      </div>
                     </li>
                   ))}
                 </ul>
               )}
 
               {selectedEvent && (
-                <div className="flex fixed top-0 left-0 z-50 w-full h-full justify-center items-center bg-black bg-opacity-60">
-                  <div className="bg-white p-[20px] rounded-[20px] w-[95%] h-[300px] max-w-[600px] relative animate-fadeIn" ref={popupRef}>
-                    <span className="" onClick={handleCloseEventModal}>&times;</span>
-                    <div className=''><p>! Congratiulations !</p></div>
-                    <div className=''><p>Trophy earned by competing in</p></div>
-                    <div className=''><p>{selectedEvent.title} Event!</p></div>
-                  </div>
-                </div>
+                <ModalInfo ref={popupRef} >
+                  <div className=''><p className='font-medium text-center text-xl'>Congratulations!</p></div>
+                  <div className=''><p>Trophy earned by competing in</p></div>
+                  <div className=''><p className='text-2xl'>{selectedEvent.title} Event</p></div>
+                </ModalInfo>
               )}
             </div>
-            <div className="">
-              <TrophyList
-                runningDistance={runningDistance}
-                cyclingDistance={cyclingDistance}
-                Co2Saved={Co2Saved}
-                CaloriesBurned={CaloriesBurned}
-                MoneySaved={MoneySaved}
-                handleTrophyClick={handleTrophyClick}
-              />
-            </div>
-            {popupVisible && (
-              <div className="fixed justify-center items-center top-0 left-0 w-full h-full flex bg-black bg-opacity-60 z-50">
-                <div className="animate-fadeIn p-[30px] bg-[#fff] rounded-[15px] w-[95%] max-w-[500px] h-[300px] text-center" ref={popupRef}>
-                  <p>{popupContent.title}</p>
-                  <p>Level: {popupContent.level}</p>
-                  <p>{popupContent.detail}</p>
-                  <p>{popupContent.fact}</p>
-                </div>
-              </div>
-            )}
-          </div>
+          )}
+
+
+          {popupVisible && (
+            <ModalInfo ref={popupRef}>
+              <p className='font-medium text-xl'>{popupContent.title}</p>
+              <img src='./imagesTrophy/trophy-modal.svg' className='mt-4 mb-2 h-auto w-[260px] justify-self-center'/>
+              <p className='font-medium text-2xl'>Level: {popupContent.level}</p>
+              <p className='font-normal text-xl'>{popupContent.detail}</p>
+              <p className='font-normal text-xl'>{popupContent.fact}</p>
+            </ModalInfo>
+          )}
         </div>
       </div>
-    </div>
+    </BackGround>
+
+
+
   );
 };
 

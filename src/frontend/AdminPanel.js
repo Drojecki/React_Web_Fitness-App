@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import SidebarAdmin from './Components/SidebarAdmin';
 import "../css/adminPanel.css";
-import UserModalAdmin from "./Components/UserModalAdmin";
+import UserModalAdmin from "./Components/UserListAdmin";
 import EventsModalAdmin from "./Components/EventsModalAdmin";
 import NotificationsModalAdmin from "./Components/NotificationsModalAdmin";
 import OverviewModalAdmin from "./Components/OverviewModalAdmin";
@@ -12,7 +12,6 @@ const AdminPanel = () => {
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
-	const [user, setUser] = useState(null);
 	const [users, setUsers] = useState([]);
 	const [searchUsername, setSearchUsername] = useState("");
 	const [searchId, setSearchId] = useState("");
@@ -25,7 +24,7 @@ const AdminPanel = () => {
 	const [eventType, setEventType] = useState("bike");
 	const [eventDistance, setEventDistance] = useState("");
 	const [events, setEvents] = useState([]);
-	const [eventsError, setEventsError] = useState("");
+	const [eventsError] = useState("");
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
 	const [eventImage, setEventImage] = useState(null);
@@ -34,6 +33,9 @@ const AdminPanel = () => {
 	const [activeModal, setActiveModal] = useState('');
 	const [currentStep, setCurrentStep] = useState(1);
 	const [trophyImage, setTrophyImage] = useState(null);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [selectedUserId, setSelectedUserId] = useState(null);
+	const [actionType, setActionType] = useState(null);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -49,20 +51,17 @@ const AdminPanel = () => {
 						navigate("/");
 						return;
 					}
-	
-					const userData = await fetchUserData(token, sessionKey, userId);
-					setUser(userData);
-	
+
 					const usersData = await fetchAllUsers(token, sessionKey, userId);
 					setUsers(usersData);
 					setFilteredUsers(usersData);
-	
+
 					const notificationsData = await fetchNotifications(token, sessionKey);
 					setNotifications_popup(notificationsData);
-	
+
 					const eventsData = await fetchEvents(token, sessionKey);
 					setEvents(eventsData);
-	
+
 				} catch (err) {
 					setError(err.message);
 				}
@@ -71,99 +70,75 @@ const AdminPanel = () => {
 			}
 			setLoading(false);
 		};
-	
 		fetchData();
 	}, [navigate]);
 
-	const fetchUserData = async (token, sessionKey, userId) => {
-    try {
-        const userResponse = await fetch(`http://localhost:5000/api/users/${userId}`, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                sessionKey: sessionKey,
-            },
-        });
+	const fetchAllUsers = async (token, sessionKey, userId) => {
+		try {
+			const allUsersResponse = await fetch(`http://localhost:5000/api/users/${userId}/admin`, {
+				method: "GET",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					sessionKey: sessionKey,
+				},
+			});
 
-        if (userResponse.ok) {
-            const userData = await userResponse.json();
-            return userData[0];
-        } else {
-            localStorage.removeItem('authToken');
-            navigate('/');
-        }
-    } catch (err) {
-        throw new Error("Wystąpił błąd podczas pobierania danych użytkownika");
-    }
-};
+			if (allUsersResponse.ok) {
+				const usersData = await allUsersResponse.json();
+				return usersData;
+			} else if (allUsersResponse.status === 403) {
+				localStorage.removeItem('authToken');
+				navigate('/');
+			} else {
+				throw new Error("Błąd podczas pobierania listy użytkowników");
+			}
+		} catch (err) {
+			console.error(err);
+			throw new Error("Wystąpił błąd podczas pobierania listy użytkowników");
+		}
+	};
 
-const fetchAllUsers = async (token, sessionKey, userId) => {
-    try {
-        const allUsersResponse = await fetch(`http://localhost:5000/api/users/${userId}/admin`, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                sessionKey: sessionKey,
-            },
-        });
+	const fetchNotifications = async (token, sessionKey) => {
+		try {
+			const notificationsResponse = await fetch("http://localhost:5000/api/notifications/popup", {
+				method: "GET",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					sessionKey: sessionKey,
+				},
+			});
 
-        if (allUsersResponse.ok) {
-            const usersData = await allUsersResponse.json();
-            return usersData;
-        } else if (allUsersResponse.status === 403) {
-            localStorage.removeItem('authToken');
-            navigate('/');
-        } else {
-            throw new Error("Błąd podczas pobierania listy użytkowników");
-        }
-    } catch (err) {
-        console.error(err);
-        throw new Error("Wystąpił błąd podczas pobierania listy użytkowników");
-    }
-};
+			if (notificationsResponse.ok) {
+				const notificationsData = await notificationsResponse.json();
+				return notificationsData;
+			} else {
+				throw new Error("Błąd podczas pobierania powiadomień");
+			}
+		} catch (err) {
+			throw new Error("Wystąpił błąd podczas pobierania powiadomień");
+		}
+	};
 
+	const fetchEvents = async (token, sessionKey) => {
+		try {
+			const eventsResponse = await fetch("http://localhost:5000/api/event", {
+				method: "GET",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					sessionKey: sessionKey,
+				},
+			});
 
-const fetchNotifications = async (token, sessionKey) => {
-    try {
-        const notificationsResponse = await fetch("http://localhost:5000/api/notifications/popup", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                sessionKey: sessionKey,
-            },
-        });
-
-        if (notificationsResponse.ok) {
-            const notificationsData = await notificationsResponse.json();
-            return notificationsData;
-        } else {
-            throw new Error("Błąd podczas pobierania powiadomień");
-        }
-    } catch (err) {
-        throw new Error("Wystąpił błąd podczas pobierania powiadomień");
-    }
-};
-
-const fetchEvents = async (token, sessionKey) => {
-    try {
-        const eventsResponse = await fetch("http://localhost:5000/api/event", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                sessionKey: sessionKey,
-            },
-        });
-
-        if (eventsResponse.ok) {
-            const eventsData = await eventsResponse.json();
-            return eventsData;
-        } else {
-            throw new Error("Błąd podczas pobierania wydarzeń");
-        }
-    } catch (err) {
-        throw new Error("Wystąpił błąd podczas pobierania wydarzeń");
-    }
-};
+			if (eventsResponse.ok) {
+				const eventsData = await eventsResponse.json();
+				return eventsData;
+			} else {
+				throw new Error("Błąd podczas pobierania wydarzeń");
+			}
+		} catch (err) {
+			throw new Error("Wystąpił błąd podczas pobierania wydarzeń");
+		}
+	};
 	useEffect(() => {
 		const filtered = users.filter(
 			(user) =>
@@ -289,7 +264,7 @@ const fetchEvents = async (token, sessionKey) => {
 					setEventImage(null);
 					setTrophyImage(null);
 					const updatedEvents = await fetchEvents(token);
-        			setEvents(updatedEvents);
+					setEvents(updatedEvents);
 				} else {
 					console.error("Failed to create event");
 					alert("Failed to create event");
@@ -300,6 +275,7 @@ const fetchEvents = async (token, sessionKey) => {
 			}
 		}
 	};
+
 	const handleToggleEventStatus = async (eventId, currentStatus) => {
 		const token = localStorage.getItem("authToken");
 		const newStatus = currentStatus === "active" ? "inactive" : "active";
@@ -333,6 +309,7 @@ const fetchEvents = async (token, sessionKey) => {
 			}
 		}
 	};
+
 	const handleDeleteEvent = async (eventId) => {
 		const token = localStorage.getItem("authToken");
 		if (token) {
@@ -359,9 +336,31 @@ const fetchEvents = async (token, sessionKey) => {
 			}
 		}
 	};
+
+	const openModal = (userId, action) => {
+		setSelectedUserId(userId);
+		setActionType(action);
+		setIsModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setSelectedUserId(null);
+		setActionType(null);
+		setIsModalOpen(false);
+	};
+
+	const confirmAction = async () => {
+		if (actionType === "ban") {
+			await banUser(selectedUserId);
+		} else if (actionType === "unban") {
+			await unbanUser(selectedUserId);
+		}
+		closeModal();
+	};
+
 	const banUser = async (userId) => {
 		const token = localStorage.getItem("authToken");
-		
+
 		if (token) {
 			try {
 				const response = await fetch(
@@ -380,7 +379,7 @@ const fetchEvents = async (token, sessionKey) => {
 					const userId = decodedToken.id;
 					const sessionKey = decodedToken.sessionKey;
 					const updatedBans = await fetchAllUsers(token, sessionKey, userId);
-        			setUsers(updatedBans);
+					setUsers(updatedBans);
 				} else {
 					alert("Error Banning user");
 				}
@@ -390,10 +389,10 @@ const fetchEvents = async (token, sessionKey) => {
 			}
 		}
 	};
-	
-	const unbanUser =  async (userId) => {
+
+	const unbanUser = async (userId) => {
 		const token = localStorage.getItem("authToken");
-		
+
 		if (token) {
 			try {
 				const response = await fetch(
@@ -409,99 +408,108 @@ const fetchEvents = async (token, sessionKey) => {
 
 				if (response.ok) {
 					const decodedToken = jwtDecode(token);
-					const userId = decodedToken.id;
 					const sessionKey = decodedToken.sessionKey;
-					const updatedBans = await fetchAllUsers(token, sessionKey, userId);
-        			setUsers(updatedBans);
+					const updatedBans = await fetchAllUsers(
+						token,
+						sessionKey,
+						decodedToken.id
+					);
+					setUsers(updatedBans);
 				} else {
-					alert("Error UnBanning user");
+					alert("Error Unbanning user");
 				}
 			} catch (error) {
-				console.error("Error UnBanning user:", error);
-				alert("Error UnBanning user");
+				console.error("Error Unbanning user:", error);
+				alert("Error Unbanning user");
 			}
 		}
 	};
+
 	const toggleSidebar = () => {
 		setSidebarOpen(!sidebarOpen);
-	  };
-	  const toggleModal = (modal) => {
-        setActiveModal(modal);
-    };
+	};
+	const toggleModal = (modal) => {
+		setActiveModal(modal);
+	};
 	if (loading) return <p>Ładowanie...</p>;
 	if (error) return <p>{error}</p>;
 
 	return (
 		<div className='flex justify-start h-screen min-h-screeen items-center flex-col w-full max-w-[1600px] justify-self-center'>
-		<SidebarAdmin isOpen={sidebarOpen}toggleSidebar={toggleSidebar}toggleModal={toggleModal} />
+			<SidebarAdmin isOpen={sidebarOpen} toggleSidebar={toggleSidebar} toggleModal={toggleModal} />
 			<div className="row">
-			<button className="button btncos" onClick={toggleSidebar}>☰</button>
+				<button className="button btncos" onClick={toggleSidebar}>☰</button>
 				<button onClick={() => navigate("/UserAcc")} className="button">
 					Back to User Account
 				</button>
-				
+
 			</div>
 			{activeModal === 'events' && (
-                <EventsModalAdmin
-				trophyImage={trophyImage}
-				setTrophyImage={setTrophyImage}
-				currentStep={currentStep}
-				setCurrentStep={setCurrentStep}
-				searchUsername={searchUsername}
-				setSearchUsername={setSearchUsername}
-				searchId={searchId}
-				setSearchId={setSearchId}
-				filteredUsers={filteredUsers}
-				banUser={banUser}
-				unbanUser={unbanUser}
-				showEvent={showEvent}
-				setShowEvent={setShowEvent}
-				eventTitle={eventTitle}
-				setEventTitle={setEventTitle}
-				eventDescription={eventDescription}
-				setEventDescription={setEventDescription}
-				startDate={startDate}
-				setStartDate={setStartDate}
-				endDate={endDate}
-				setEndDate={setEndDate}
-				eventType={eventType}
-				setEventType={setEventType}
-				eventDistance={eventDistance}
-				setEventDistance={setEventDistance}
-				eventImage={eventImage}
-				setEventImage={setEventImage}
-				handleEventSubmit={handleEventSubmit}
-				events={events}
-				handleToggleEventStatus={handleToggleEventStatus}
-				handleDeleteEvent={handleDeleteEvent}
-				eventsError={eventsError}
-			/>
-            )}
+				<EventsModalAdmin
+					actionType={actionType}
+					trophyImage={trophyImage}
+					setTrophyImage={setTrophyImage}
+					currentStep={currentStep}
+					setCurrentStep={setCurrentStep}
+					searchUsername={searchUsername}
+					setSearchUsername={setSearchUsername}
+					searchId={searchId}
+					setSearchId={setSearchId}
+					filteredUsers={filteredUsers}
+					banUser={banUser}
+					unbanUser={unbanUser}
+					showEvent={showEvent}
+					setShowEvent={setShowEvent}
+					eventTitle={eventTitle}
+					setEventTitle={setEventTitle}
+					eventDescription={eventDescription}
+					setEventDescription={setEventDescription}
+					startDate={startDate}
+					setStartDate={setStartDate}
+					endDate={endDate}
+					setEndDate={setEndDate}
+					eventType={eventType}
+					setEventType={setEventType}
+					eventDistance={eventDistance}
+					setEventDistance={setEventDistance}
+					eventImage={eventImage}
+					setEventImage={setEventImage}
+					handleEventSubmit={handleEventSubmit}
+					events={events}
+					handleToggleEventStatus={handleToggleEventStatus}
+					handleDeleteEvent={handleDeleteEvent}
+					eventsError={eventsError}
+				/>
+			)}
 			{activeModal === 'users' && (
-                <UserModalAdmin
-                    searchUsername={searchUsername}  
-                    setSearchUsername={setSearchUsername} 
-                    searchId={searchId}                
-                    setSearchId={setSearchId}        
-                    filteredUsers={filteredUsers}      
-                    banUser={banUser}                    
-                    unbanUser={unbanUser}                
-                />
-            )}
+				<UserModalAdmin
+					confirmAction={confirmAction}
+					isModalOpen={isModalOpen}
+					closeModal={closeModal}
+					searchUsername={searchUsername}
+					setSearchUsername={setSearchUsername}
+					searchId={searchId}
+					setSearchId={setSearchId}
+					filteredUsers={filteredUsers}
+					banUser={banUser}
+					unbanUser={unbanUser}
+					openModal={openModal}
+				/>
+			)}
 			{activeModal === 'overview' && (
-                <OverviewModalAdmin/>
-            )}
+				<OverviewModalAdmin />
+			)}
 			{activeModal === 'notifications' && (
-                <NotificationsModalAdmin
-				notifications_popup={notifications_popup}
-				notificationHeader={notificationHeader}
-				setNotificationHeader={setNotificationHeader}
-				notificationContent={notificationContent}
-				setNotificationContent={setNotificationContent}
-				handleNotificationSubmit={handleNotificationSubmit}
-				handleDeleteNotification={handleDeleteNotification}
-			/>
-            )}
+				<NotificationsModalAdmin
+					notifications_popup={notifications_popup}
+					notificationHeader={notificationHeader}
+					setNotificationHeader={setNotificationHeader}
+					notificationContent={notificationContent}
+					setNotificationContent={setNotificationContent}
+					handleNotificationSubmit={handleNotificationSubmit}
+					handleDeleteNotification={handleDeleteNotification}
+				/>
+			)}
 		</div>
 	);
 };
