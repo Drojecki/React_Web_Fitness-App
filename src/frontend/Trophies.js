@@ -131,13 +131,11 @@ const Trophies = () => {
               setError('events query/server error');
             }
           } else {
-            setError('user info query/server error');
+            localStorage.removeItem('authToken');
+            navigate('/');
           }
         } catch (err) {
-          const errorMessage = err.response
-            ? `Server Error: ${err.response.status} - ${err.response.statusText}`
-            : `Client Error: ${err.message}`;
-          setError(errorMessage || 'query/server error ');
+          setError('query/server error ');
         }
       } else {
         navigate('/');

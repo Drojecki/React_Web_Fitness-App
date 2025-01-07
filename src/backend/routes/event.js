@@ -18,6 +18,58 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+/**
+ * @swagger
+ * /api/event/thropies/{id}:
+ *   get:
+ *     summary: Get unique trophies earned by a user
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID of the user 
+ *         schema:
+ *           type: integer
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         description: AuthToken
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of trophies retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: ID of the trophy
+ *                   title:
+ *                     type: string
+ *                     description: Title of the trophy
+ *                   description:
+ *                     type: string
+ *                     description: Description of the trophy
+ *                   image:
+ *                     type: string
+ *                     description: Image URL for the trophy
+ *                   TrophyImage:
+ *                     type: string
+ *                     description: Specific image for the trophy
+ *                   user_ids:
+ *                     type: string
+ *                     description: List of user IDs that have earned the trophy
+ *       401:
+ *         description: Token is required
+ *       500:
+ *         description: Database error
+ */
+
 //wyświetla unikalne id zdobyte przez usera
 router.get('/trophies/:id', async (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
@@ -44,6 +96,83 @@ router.get('/trophies/:id', async (req, res) => {
     return res.status(500).json({ error: 'DB error' });
   }
 });
+
+/**
+ * @swagger
+ * /api/event:
+ *   post:
+ *     summary: Create a new event (admin only)
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         description: AuthToken
+ *         schema:
+ *           type: string
+ *       - name: image
+ *         in: formData
+ *         type: file
+ *         description: Event image to be uploaded
+ *       - name: trophyImage
+ *         in: formData
+ *         type: file
+ *         description: Trophy image to be uploaded
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Title of the event
+ *               description:
+ *                 type: string
+ *                 description: Description of the event
+ *               startDate:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Event start date and time
+ *               endDate:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Event end date and time
+ *               type:
+ *                 type: string
+ *                 description: Type/category of the event
+ *               distance:
+ *                 type: integer
+ *                 description: Distance related to the event
+ *             required:
+ *               - title
+ *               - description
+ *               - startDate
+ *               - endDate
+ *               - type
+ *               - distance
+ *     responses:
+ *       201:
+ *         description: Event created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *                 eventId:
+ *                   type: integer
+ *                   description: The ID of the newly created event
+ *       400:
+ *         description: Missing required fields
+ *       401:
+ *         description: Token is required
+ *       500:
+ *         description: Server error or database error
+ */
+
 
   //tworzenie eventu z panelu admina
   router.post('/', upload.fields([{ name: 'image' }, { name: 'trophyImage' }]), async (req, res) => {
@@ -87,6 +216,44 @@ router.get('/trophies/:id', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/event/{eventId}:
+ *   delete:
+ *     summary: Delete event 
+ *     parameters:
+ *       - name: eventId
+ *         in: path
+ *         required: true
+ *         description: ID of the event to delete
+ *         schema:
+ *           type: integer
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         description: AuthToken
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Event and its data successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *       400:
+ *         description: Invalid or missing eventId
+ *       401:
+ *         description: Token is required
+ *       404:
+ *         description: Event not found
+ *       500:
+ *         description: Server or database error
+ */
 
 //usuwa event i wszystkie jego dane 
 router.delete('/:eventId', async (req, res) => {
@@ -142,6 +309,68 @@ router.delete('/:eventId', async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /api/event:
+ *   get:
+ *     summary: Get all events
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         description: AuthToken
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: Event ID
+ *                   title:
+ *                     type: string
+ *                     description: Event title
+ *                   description:
+ *                     type: string
+ *                     description: Event description
+ *                   startDate:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Event start date
+ *                   endDate:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Event end date
+ *                   type:
+ *                     type: string
+ *                     description: Event type
+ *                   distance:
+ *                     type: integer
+ *                     description: Event distance
+ *                   image:
+ *                     type: string
+ *                     description: URL of the event image
+ *                   TrophyImage:
+ *                     type: string
+ *                     description: URL of the trophy image
+ *                   user_ids:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                     description: List of user IDs
+ *       401:
+ *         description: Token is required
+ *       500:
+ *         description: database error
+ */
   
 //wyświetla dane eventów
 router.get('/', async (req, res) => {

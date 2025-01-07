@@ -75,9 +75,10 @@ const Rankings = () => {
 
           if (rankingResponse.ok) {
             const rankingData = await rankingResponse.json();
-
             const parsedRanking = rankingData.map(entry => ({
+              username: entry.username,
               user_id: entry.user_id,
+              profilePicture: entry.profilePicture,
               total_CO2: parseFloat(entry.total_CO2) || 0,
               total_kcal: parseFloat(entry.total_kcal) || 0,
               total_money: parseFloat(entry.total_money) || 0,
@@ -148,9 +149,11 @@ const Rankings = () => {
 
   const getRankingItems = (type) => {
     const sortedRanking = [...ranking].sort((a, b) => b[type] - a[type]);
-
     return sortedRanking.map((entry, index) => {
-      const userData = usernameMap[entry.user_id] || { username: 'Unknown User', profilePicture: '' };
+
+      const userData = usernameMap[entry.user_id] || { username: `${entry.username}`, profilePicture: `${entry.profilePicture}` };
+
+
       const showImage = index < 3;
 
       const userClass = index < 3 ? 'text-[#3B4A3F] text-center relative ' : ' h-[45px] shadow-[0px_4px_4px_rgba(11,14,52,0.2)]  CustomXXSM:h-[40px] text-black w-full  mb-[10px] pr-[25px] pl-[25px] p-[5px] rounded-[15px] flex box-border bg-[#F1FCF3] gap-[10px]';
@@ -166,19 +169,26 @@ const Rankings = () => {
 
       return (
         entry[type] !== undefined && (
+
           <ul key={entry.user_id} className={`${userClass} justify-between `}>
-            {showImage && !userData.profilePicture && (
-              <div className={`mb-[35px]  CustomXSM:w-[90px] CustomXSM:h-[90px] w-[130px] h-[130px] rounded-full flex items-center justify-center ${borderClass}`}>
-                <span className=" text-black  text-xl bg-white w-full h-full rounded-full content-center ">{userData.username.charAt(0).toUpperCase()}</span>
+            {/* {showImage && userData.profilePicture === 'null' && (
+              <div className={` mb-[35px]  CustomXSM:w-[90px] CustomXSM:h-[90px] w-[130px] h-[130px] rounded-full flex items-center justify-center ${borderClass}`}>
+                <span className=" text-[#3C4A3B]  text-[32px] bg-[#C6C6C6] w-full h-full rounded-full content-center font-bold">{userData.username.charAt(0).toUpperCase()}</span>
               </div>
-            )}
-            {showImage && userData.profilePicture && (
+            )} */}
+            {showImage && userData && userData.profilePicture && userData.profilePicture !== 'null' ? (
               <img
                 src={`http://localhost:5000${userData.profilePicture}`}
                 alt="Profile"
-                className={`mb-[35px]  CustomXSM:w-[90px] CustomXSM:h-[90px] w-[130px] h-[130px] rounded-full ${borderClass}`}
+                className={`mb-[35px] CustomXSM:w-[90px] CustomXSM:h-[90px] w-[130px] h-[130px] rounded-full ${borderClass}`}
               />
-            )}
+            ) : showImage && userData ? (
+              <div className={`mb-[35px] CustomXSM:w-[90px] CustomXSM:h-[90px] w-[130px] h-[130px] rounded-full flex items-center justify-center ${borderClass}`}>
+                <span className="text-[#3C4A3B] text-[32px] bg-[#C6C6C6] w-full h-full rounded-full content-center font-bold">
+                  {userData.username.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            ) : null}
             {index === 0 && <img alt='first' className="absolute CustomXSM:top-[80px] CustomXSM:w-[30px] CustomXSM:h-[40px] top-[125px] w-[40px] h-[60px] left-1/2 transform -translate-x-1/2 -translate-y-1/2" src={first} />}
             {index === 1 && <img alt='second' className="absolute CustomXSM:top-[80px] CustomXSM:w-[30px] CustomXSM:h-[40px] top-[125px] w-[40px] h-[60px] left-1/2 transform -translate-x-1/2 -translate-y-1/2" src={second} />}
             {index === 2 && <img alt='third' className="absolute CustomXSM:top-[80px] CustomXSM:w-[30px] CustomXSM:h-[40px] top-[125px] w-[40px] h-[60px] left-1/2 transform -translate-x-1/2 -translate-y-1/2" src={third} />}

@@ -150,10 +150,6 @@ CREATE TABLE `events` (
 -- Dumping data for table `events`
 --
 
-INSERT INTO `events` (`id`, `title`, `description`, `type`, `distance`, `image`, `created_at`, `startDate`, `endDate`, `status`, `user_ids`, `TrophyImage`) VALUES
-(96, 'Winter Running', 'Run 100 this month', 'run', 100.00, '../../public/uploads/chander-r-z4WH11FMfIQ-unsplash.jpg', '2024-12-13 15:50:21', '2024-12-01', '2024-12-31', 'active', '106', '../../public/uploads/chander-r-z4WH11FMfIQ-unsplash.jpg'),
-(97, 'Winter weekend', 'Cycle 75Km this weekend', 'bike', 75.00, '../../public/uploads/holly-chisholm-xZc2JgyU_Jg-unsplash.jpg', '2024-12-13 15:54:08', '2024-12-13', '2024-12-15', 'active', '106', '../../public/uploads/holly-chisholm-xZc2JgyU_Jg-unsplash.jpg');
-
 -- --------------------------------------------------------
 
 --

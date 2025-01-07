@@ -18,7 +18,7 @@ const TrophyList = ({
 
 
   return (
-    <div className="grid grid-cols-3 gap-3 justify-items-center box-border text-[#3B4A3F] CustomTrophiesL:grid-cols-2 CustomTrophiesSM:grid-cols-1 CustomXXSM:mt-[70px]">
+    <div className="grid grid-cols-3 gap-3 justify-items-center box-border text-[#3B4A3F] CustomSM:grid-cols-2 CustomXXSM:grid-cols-1 CustomXXSM:mt-[70px]">
       <div className={`content-center bg-[#F1FCF3] hover:cursor-pointer hover:scale-105 level-${runningTrophy.level} m-[10px] w-[260px] h-[310px] rounded-[18px] p-[10px] box-border shadow-[0px_4px_4px_rgba(11,14,52,0.20)]`} onClick={() => handleTrophyClick('running')}>
         <div className="">
           <h3 className="text-center text-xl font-medium">Running </h3>
