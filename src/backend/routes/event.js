@@ -81,7 +81,7 @@ router.get('/trophies/:id', async (req, res) => {
 
   try {
     const db = await getDb();
-    const sqlQuery = 'SELECT id, title, image, TrophyImage, user_ids FROM events WHERE FIND_IN_SET(?, user_ids) > 0';
+    const sqlQuery = 'SELECT id, title, description, image, distance, type, TrophyImage, user_ids FROM events WHERE FIND_IN_SET(?, user_ids) > 0';
     const [results] = await db.execute(sqlQuery, [userId]);
 
     if (results.length === 0) {

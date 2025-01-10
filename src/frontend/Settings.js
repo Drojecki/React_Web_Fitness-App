@@ -165,29 +165,25 @@ const Settings = () => {
                 <div className='w-[95%]'>
                   <button onClick={() => setShowSettings(true)} className='text-[#3B4A3F] text-[26px] hover:text-[30px] CustomXSM:text-[20px]  CustomXSM:hover:text-[24px] h-[60px]'>{"<"} Go back</button>
                   <div className='w-full max-w-[500px] justify-self-center mt-[20px] text-[#3B4A3F] text-[20px] overflow-y-auto scrollbar-hide max-h-[500px] p-[10px]'>
-                    <div>
-                      <h3>What is this website about?</h3>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla auctor vehicula lacus.</p>
+                    <div className='mb-[10px]'>
+                      <h3>1. What is EcoSphere and how does it work?</h3>
+                      <p>EcoSphere is a sustainable transport app that connects users with eco-friendly transport options. Open the app and start your eco journey!</p>
                     </div>
-                    <div>
-                      <h3>How do I reset my password?</h3>
-                      <p>Curabitur vehicula neque nec sem tempus fermentum. Mauris ac sapien vel mauris eleifend fermentum.</p>
+                    <div className='mb-[10px]'>
+                      <h3>2. How do I sign up and create an account?</h3>
+                      <p>You can sign up through our website or mobile app by providing your email address.</p>
                     </div>
-                    <div>
-                      <h3>How do I reset my password?</h3>
-                      <p>Curabitur vehicula neque nec sem tempus fermentum. Mauris ac sapien vel mauris eleifend fermentum.</p>
+                    <div className='mb-[10px]'>
+                      <h3>3. How does EcoSphere promote sustainability?</h3>
+                      <p>The app  provides real-time CO₂ savings data to help you track your environmental impact.</p>
                     </div>
-                    <div>
-                      <h3>How do I reset my password?</h3>
-                      <p>Curabitur vehicula neque nec sem tempus fermentum. Mauris ac sapien vel mauris eleifend fermentum.</p>
+                    <div className='mb-[10px]'>
+                      <h3>4. Is EcoSphere free to use?</h3>
+                      <p>The app is completely free!</p>
                     </div>
-                    <div>
-                      <h3>How do I reset my password?</h3>
-                      <p>Curabitur vehicula neque nec sem tempus fermentum. Mauris ac sapien vel mauris eleifend fermentum.</p>
-                    </div>
-                    <div>
-                      <h3>How do I reset my password?</h3>
-                      <p>Curabitur vehicula neque nec sem tempus fermentum. Mauris ac sapien vel mauris eleifend fermentum.</p>
+                    <div className='mb-[10px]'>
+                      <h3>5. How do I track my environmental impact?</h3>
+                      <p>After each trip, EcoSphere provides a summary of your journey, including the distance traveled and the estimated carbon emissions saved compared to traditional transport methods. Access your Web Dashboard for a detailed report on your cumulative sustainability efforts.</p>
                     </div>
                   </div>
                 </div>

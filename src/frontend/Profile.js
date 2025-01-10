@@ -86,7 +86,7 @@ const Profile = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  const MAX_FILE_SIZE_MB = 1;
+  const MAX_FILE_SIZE_MB = 8;
   const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
   const handleFileChange = (event) => {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 28, 2024 at 09:36 PM
+-- Generation Time: Jan 10, 2025 at 05:47 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -149,6 +149,10 @@ CREATE TABLE `events` (
 --
 -- Dumping data for table `events`
 --
+
+INSERT INTO `events` (`id`, `title`, `description`, `type`, `distance`, `image`, `created_at`, `startDate`, `endDate`, `status`, `user_ids`, `TrophyImage`) VALUES
+(104, 'Winter Holidays with EcoSphere', 'Join our initiative to help reduce CO2 emissions!', 'run', 100.00, '../../public/uploads/AdobeStock_318577956.jpeg', '2025-01-10 14:55:59', '2025-01-01', '2025-03-31', 'active', '106', '../../public/uploads/WinterEventCard.png'),
+(105, 'Max out running - Winter 2025', 'Challenge yourself in a winter running event promo...', 'run', 75.00, '../../public/uploads/AdobeStock_145471371.jpeg', '2025-01-10 14:57:27', '2025-01-01', '2025-03-31', 'active', '106', '../../public/uploads/HolidayEventCard.png');
 
 -- --------------------------------------------------------
 
@@ -425,11 +429,11 @@ INSERT INTO `users` (`id`, `username`, `password_hash`, `email`, `age`, `gender`
 (44, 'marek', '$2b$10$SNQIwyR7QYRxHhyU5954Au9otzo8ufoNBc2J26SxUvcWy0THY9nK6', 'marek@marek.pl', 18, 'M', '2024-08-13 10:48:38', '2024-08-13 08:48:38', 0, NULL, 1, 1, NULL, 0),
 (45, '123', '123', '123@123', 20, 'M', '2024-08-13 10:38:16', '2024-08-13 10:38:16', 0, NULL, 1, 1, NULL, 0),
 (47, 'sdsadas', '$2b$10$oGijqPa1jXToobCQ7cwd8Ocw/7omuH/o5R6uWhKEEibvuHkS0xIaS', '123@123.pl', 66, 'M', '2024-08-13 12:40:26', '2024-08-13 10:40:26', 0, NULL, 1, 1, NULL, 0),
-(48, '321', '$2b$10$j50LlsAFXDqRapodAcN1A.44N3/q6vPWzwDWR.OjDinni3cYOJPym', '321@123', 20, 'M', '2024-08-13 10:56:54', '2024-08-13 10:56:54', 0, '/uploads/1734887267955-FirstImg.jpg', 1, 1, '5b294da66c9738ae03b3badab25735b2efc668c4ad2ccabe92423779e207b488fca0ae346703d908728acdb9d14b5872b105b3c042ea4717419ea91c8ad780ab', 1),
+(48, '321', '$2b$10$j50LlsAFXDqRapodAcN1A.44N3/q6vPWzwDWR.OjDinni3cYOJPym', '321@123', 20, 'M', '2024-08-13 10:56:54', '2024-08-13 10:56:54', 0, '/uploads/1736522125384-AdobeStock_597868879.jpeg', 1, 1, '3bf464161048840596c7cc400d460edfa9ed6f31c27255d4832e90c6d132b4094a412852b52fd66dd143d29683eeeda85f4574eae5000f2be188bb2122f4bead', 1),
 (49, 'amrekawe', '$2b$10$0gCOTofH27vV8NsGKZQpOOozzSA7Sq.bpwczQnRd1954iWzI44Wu.', 'qwer@wer.pl', 32, 'M', '2024-08-13 13:12:36', '2024-08-13 11:12:36', 0, NULL, 1, 1, NULL, 0),
-(52, 'MarekMarek', '$2b$10$CrFg7KDZeJwrHOd2Br.43upURlQ2yi2xu8/4CsNXdd0wizwHCLIVO', 'jule111k@julek.pl', 19, 'M', '2024-08-13 23:10:18', '2024-08-13 21:10:19', 0, '/uploads/1734105450343-ThirdImg.jpg', 0, 0, 'a550e0eb4041047ace563034a11f1e5d3880075cac754c2004ca8c91a09fbb293f7a6db6244ad4a908ff3557731ca0ccc4c28004c58a58625a7eda07fb318499', 1),
+(52, 'MarekMarek', '$2b$10$CrFg7KDZeJwrHOd2Br.43upURlQ2yi2xu8/4CsNXdd0wizwHCLIVO', 'jule111k@julek.pl', 19, 'M', '2024-08-13 23:10:18', '2024-08-13 21:10:19', 0, '/uploads/1736522145349-AdobeStock_35612378.jpeg', 0, 0, '7fc2d6c0c972fa95c1a2c9a65974f5b5ed39d49a88006ad04ff485d46c9e1e40027cb1eb3b79143a961a6f165c9a38fce7df0d282ea4e24f8ea6649ab8310cb0', 1),
 (53, 'qwwerty', '$2b$10$pM4v0e6a1fYICUiEitQIAen6Y6ApZnDI1QMN3AacTcKtrXPz/mMEC', 'hfvjhaskj@msdaf.ps', 45, 'F', '2024-08-13 23:48:22', '2024-08-13 21:48:22', 0, NULL, 1, 1, NULL, 0),
-(54, 'Fifi', '$2b$10$221LtnADl5RTKGdYMhKCK.8u14dC8vTsIZfRADgQMDN.vjgG8UInm', 'niktCieNieKocha@Dzięki.pl', 30, 'M', '2024-08-24 17:13:26', '2024-08-24 15:13:30', 0, '/uploads/1734105476253-SecondImg.jpg', 1, 1, '814a0f854fd751cbd71f94bbe660bca30178efafef66d9d72a96da2bb9624ccf66a2fa1948b077a32b5c6eadeb5bbd7e5221e5bcf70be75ebcfaf1ed5bfe949b', 0),
+(54, 'Fifi', '$2b$10$221LtnADl5RTKGdYMhKCK.8u14dC8vTsIZfRADgQMDN.vjgG8UInm', 'niktCieNieKocha@Dzięki.pl', 30, 'M', '2024-08-24 17:13:26', '2024-08-24 15:13:30', 0, '/uploads/1736522218972-AdobeStock_752852021.jpeg', 1, 1, '571dee77ae4b2a4b84583cb3da2764cb6c5f6b9825b5e1119971287f6e117d37ea9d5c86fc5b4e9a441e07ed7dbc2b9963921d517f86988354c68c6a8330850a', 0),
 (67, 'qweqweqwe', '$2b$10$IathYXWJFkSKbJn0k0j0punyd84dKsg2aJpMobqLkv0kFoxi4UpfG', 'qweqwe@qwe.qwe', 67, 'M', '2024-09-11 19:36:38', '2024-09-11 17:36:37', 0, NULL, 1, 1, NULL, 0),
 (71, 'hbydsfvijh', '$2b$10$qWdWCECvCImV/1oSQI7Wm.gvJRxjv/JE5Egappo.JRTG4pwVw/MhS', 'fajsuhgfihsdi123@aidug.12', 44, 'M', '2024-09-11 19:50:34', '2024-09-11 17:50:33', 0, NULL, 1, 1, NULL, 0),
 (73, 'MarekMarekMarek', '$2b$10$MpxeeEc8YdXRWexwdwmFGOCDLuLTAD4nMMtasDS/NStnJmage3ZZG', '123@12223.pl', 20, 'M', '2024-09-11 23:30:14', '2024-09-11 21:30:15', 0, '', 1, 1, '50b196b5600b97760794b35ce148b7d3ae3694c9137192424dd746fbf1b51c9ce13bfe5307369f6bf6efe8915e077a0914454dc11ff8b0ec3d5dca61da833945', 1),
@@ -456,7 +460,7 @@ INSERT INTO `users` (`id`, `username`, `password_hash`, `email`, `age`, `gender`
 (103, 'testxd', '$2b$10$M0PWAozO34AYs1fuHBsxyeH9jItCfoDrNf0DRIeUkAbHgVsufcqr2', 'test@test.pl', 23, 'M', '2024-11-02 21:01:13', '2024-11-02 21:01:13', 0, NULL, 1, 1, 'f4124e00aff55165c271afee3f08feb527f89ff9ec198c674689f54636080f1959e865b7303836f7d296778dfd3f7c8d5dae1113127f317f9223212ad8346fb3', 0),
 (104, 'testxdxd', '$2b$10$vIbFI7bDOwfehdCYpu2qzOOpXivRpPdtIcJkFR3W928emtxpcQaB2', 'test@test.ig', 32, 'F', '2024-11-02 21:08:25', '2024-11-02 21:08:25', 1, NULL, 1, 1, '99ca1c8c6f60b1ee5d12b6e3af06f0a70bd889951691184d492129b09d97d4ad794868b8a37ddbe9be03b24899d20a88cd54c86cc240cfdc5ad4a2c4bd783dc0', 0),
 (105, 'testczxcxz', '$2b$10$4N2W4hobwtPRN0PhHPODTOiLtQkC0GvvnVQzVjxEBYGDDKXiQk5DS', '123@123.pll', 32, 'F', '2024-11-03 17:08:29', '2024-11-03 17:08:29', 0, NULL, 1, 1, NULL, 0),
-(106, 'JohnWick', '$2b$10$GdbYmeEcA836r11ns/Z7q.gnKVoVvudblZ3wQ6i0Lh2yo/JtS9hdK', 'John@Wick.pl', 25, 'M', '2024-12-13 15:23:29', '2024-12-13 15:23:29', 0, NULL, 0, 0, '7b055029453c79dfdd59d301c7bb191cdacdf6f5acf1d2f34eccacff1d0c6808f64a4716f2a308d24d8843798db3bef43edeecbaa2c975218e37a9eb66c36af7', 0);
+(106, 'JohnWick', '$2b$10$GdbYmeEcA836r11ns/Z7q.gnKVoVvudblZ3wQ6i0Lh2yo/JtS9hdK', 'John@Wick.pl', 25, 'M', '2024-12-13 15:23:29', '2024-12-13 15:23:29', 0, NULL, 0, 0, '889a93870a655096ca62f6e7b74e0e427e974d1e30b9fb7eba5594e16bdced7ee346295f532839f23b9fd7f2d587c31bc2ef84152f8a1044c71ba3671cd587e9', 0);
 
 -- --------------------------------------------------------
 
@@ -682,7 +686,9 @@ INSERT INTO `user_routes` (`id`, `user_id`, `transport_mode_id`, `distance_km`, 
 (200, 106, 3, 17.5, '2024-12-08 23:00:00', 5, 242, '00:40:00', 11.2, 1),
 (201, 106, 1, 42.2, '2024-12-07 23:00:00', 5.5, 2000, '00:30:00', 150, 1),
 (202, 106, 1, 10, '2024-12-06 23:00:00', 5.5, 230, '00:30:00', 32, 1),
-(203, 106, 2, 75, '2024-12-14 19:40:18', 2.5, 50, '00:30:00', 15, 1);
+(203, 106, 2, 75, '2024-12-14 19:40:18', 2.5, 50, '00:30:00', 15, 1),
+(204, 106, 1, 20, '2025-01-10 14:59:21', 2.5, 50, '00:30:00', 15, 1),
+(205, 106, 1, 100, '2025-01-10 14:59:42', 2.5, 50, '07:30:00', 15, 1);
 
 -- --------------------------------------------------------
 
@@ -894,7 +900,7 @@ ALTER TABLE `comments`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
 -- AUTO_INCREMENT for table `friends`
@@ -948,7 +954,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_routes`
 --
 ALTER TABLE `user_routes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=204;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
 
 --
 -- Constraints for dumped tables
