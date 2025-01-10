@@ -151,8 +151,8 @@ CREATE TABLE `events` (
 --
 
 INSERT INTO `events` (`id`, `title`, `description`, `type`, `distance`, `image`, `created_at`, `startDate`, `endDate`, `status`, `user_ids`, `TrophyImage`) VALUES
-(104, 'Winter Holidays with EcoSphere', 'Join our initiative to help reduce CO2 emissions!', 'run', 100.00, '../../public/uploads/AdobeStock_318577956.jpeg', '2025-01-10 14:55:59', '2025-01-01', '2025-03-31', 'active', '106', '../../public/uploads/WinterEventCard.png'),
-(105, 'Max out running - Winter 2025', 'Challenge yourself in a winter running event promo...', 'run', 75.00, '../../public/uploads/AdobeStock_145471371.jpeg', '2025-01-10 14:57:27', '2025-01-01', '2025-03-31', 'active', '106', '../../public/uploads/HolidayEventCard.png');
+(104, 'Winter Holidays with EcoSphere', 'Join our initiative to help reduce CO2 emissions!', 'run', 100.00, 'uploads/AdobeStock_318577956.jpeg', '2025-01-10 14:55:59', '2025-01-01', '2025-03-31', 'active', '106', 'uploads/WinterEventCard.png'),
+(105, 'Max out running - Winter 2025', 'Challenge yourself in a winter running event promo...', 'run', 75.00, 'uploads/AdobeStock_145471371.jpeg', '2025-01-10 14:57:27', '2025-01-01', '2025-03-31', 'active', '106', 'uploads/HolidayEventCard.png');
 
 -- --------------------------------------------------------
 

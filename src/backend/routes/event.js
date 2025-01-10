@@ -81,21 +81,32 @@ router.get('/trophies/:id', async (req, res) => {
 
   try {
     const db = await getDb();
-    const sqlQuery = 'SELECT id, title, description, image, distance, type, TrophyImage, user_ids FROM events WHERE FIND_IN_SET(?, user_ids) > 0';
+
+    const sqlQuery = `
+      SELECT id, title, description, image, distance, type, TrophyImage, user_ids
+      FROM events
+      WHERE FIND_IN_SET(?, user_ids) > 0
+    `;
     const [results] = await db.execute(sqlQuery, [userId]);
 
-    if (results.length === 0) {
-      return res.status(200).json({ message: 'No trophies found' });
+    if (!results || results.length === 0) {
+      return res.status(200).json({ message: '' });
     }
 
-    res.json(results);
-    console.log(results);
-    return res.status(200).json({ message: 'Gicior' });
+    return res.status(200).json(results);
   } catch (err) {
-    console.error('Query error:', err);
-    return res.status(500).json({ error: 'DB error' });
+    console.error('Database query error:', err);
+
+    if (err.code === 'ER_ACCESS_DENIED_ERROR') {
+      return res.status(403).json({ error: 'Database access denied' });
+    } else if (err.code === 'ER_BAD_FIELD_ERROR') {
+      return res.status(400).json({ error: 'Invalid query or database field' });
+    } else {
+      return res.status(500).json({ error: 'Internal server error' });
+    }
   }
 });
+
 
 /**
  * @swagger

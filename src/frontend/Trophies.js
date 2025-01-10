@@ -295,7 +295,7 @@ const Trophies = () => {
                   {events.map(event => (
                     <li key={event.id} className=" hover:scale-105 hover:cursor-pointer" onClick={() => handleTrophyEventClick(event)}>
                       <div className='flex w-[350px] h-[150px] bg-white rounded-[12px]'>
-                        <img className='w-[150px] h-[150px] rounded-[12px] shadow-[0px_4px_4px_rgba(11,14,52,0.20)]' src={`http://localhost:5000/uploads/${event.TrophyImage.split('/').pop()}`} alt={event.title} />
+                        <img className='w-[150px] h-[150px] rounded-[12px] shadow-[0px_4px_4px_rgba(11,14,52,0.20)]' src={`http://localhost:5000/${event.TrophyImage}`} alt={event.title} />
                         <div className='justify-items-center m-auto p-[10px]'>
                           <p className='font-semibold text-center content-center'>{event.title}</p>
                           <button className='w-[130px] h-[40px] bg-[#84D49D] text-white rounded-[20px] mt-[10px]'>Achived!</button>
@@ -312,7 +312,7 @@ const Trophies = () => {
                 <div className=''><p className='text-2xl color-[#3B4A3F]'>Trophy earned by competing in</p></div>
                 <div className=''><p className='text-2xl font-medium color-[#3B4A3F]'>{selectedEvent.title} Event</p></div>
                 <p className='text-xl content-center color-[#3B4A3F]'>{selectedEvent.description}</p>
-                <img className='w-[250px] h-[250px] m-auto mt-[10px] mb-[10px] rounded-[12px] shadow-[0px_4px_4px_rgba(11,14,52,0.20)]' src={`http://localhost:3000/uploads/${selectedEvent.TrophyImage.split('/').pop()}`} alt={selectedEvent.title} />
+                <img className='w-[250px] h-[250px] m-auto mt-[10px] mb-[10px] rounded-[12px] shadow-[0px_4px_4px_rgba(11,14,52,0.20)]' src={`http://localhost:5000/${selectedEvent.TrophyImage}`} alt={selectedEvent.title} />
                 <div className='text-xl font-medium color-[#3B4A3F]  flex justify-between max-w-[400px] m-auto'>
                   <div>Activity type: {selectedEvent.type.charAt(0).toUpperCase() + selectedEvent.type.slice(1) +' '} </div>
                   <div>Distance: {selectedEvent.distance}</div>
